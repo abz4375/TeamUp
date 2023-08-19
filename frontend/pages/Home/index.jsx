@@ -1,16 +1,16 @@
 import React from "react";
-// import Sidebar from "./Components/Sidebar";
-// import Profile from "./Components/Profile";
-// import ProjectPane from "./Components/ProjectPane";
-// import TaskPane from "./Components/TaskPane";
-// import TaskItem from "./Components/Task";
-// import "./index.css";
+import Sidebar from "./Components/Sidebar";
+import Profile from "./Components/Profile";
+import ProjectPane from "./Components/ProjectPane";
+import TaskPane from "./Components/TaskPane";
+// import Task from "./Components/Task";
+import "./index.css";
 
 const Home = () => {
   return (
     <div>
       Home
-      {/* <div className="container">
+      <div className="container">
         <Sidebar />
         <div className="mainFrame">
           <div className="middleFrame">
@@ -21,7 +21,7 @@ const Home = () => {
             <Profile />
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
