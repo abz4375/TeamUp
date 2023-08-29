@@ -3,7 +3,6 @@ import Sidebar from "./Components/Sidebar";
 import Profile from "./Components/Profile";
 import ProjectPane from "./Components/ProjectPane";
 import TaskPane from "./Components/TaskPane";
-// import Task from "./Components/Task";
 import "./index.css";
 
 const Home = () => {
