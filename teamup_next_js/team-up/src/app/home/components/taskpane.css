@@ -1,4 +1,8 @@
 .task{
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
+}
+
+.paperTask{
+    box-shadow: 0px 0px 5px rgba(120, 120, 120, 1);
 }

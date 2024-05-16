@@ -1,29 +1,34 @@
 .container{
-    width: 90%;
+    /* width: 90%;
     height: 90%;
     display: flex;
-    flex-direction: row;
+    flex-direction: row; */
 }
 .profile{
     /* position: absolute;
     top: 10;
-    right: 1; */
+    right: 1;
     width:12px;
     margin:0;
-    padding:0;
+    padding:0; */
+    width: 5%;
 }
 .mainFrame{
-    display: flex;
-    flex-direction: row;
-    padding: 20;
-    width: 72%;
+    /* display: flex;
+    flex-direction: row; */
+    /* padding: 20; */
+    width:95.5%;
 }
 
 .projectpane{
-    width:78vw;
-    overflow:hidden;
+    /* width:78vw;
+    overflow:hidden; */
 }
 .taskpane{
-    width:78vw;
+    /* width:78vw; */
     /* overflow: scroll; */
+}
+
+.middleFrame {
+    width: 95%;
 }

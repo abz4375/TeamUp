@@ -4,7 +4,7 @@ import "./globals.css";
 // import { useEffect } from "react";
 // import { connectDB } from "../../config/db";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Team Up",
@@ -22,8 +22,9 @@ export default function RootLayout({
   // }, []);
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
+      {/* <body> */}
+      <body >
+          {children}
       </body>
     </html>
   );

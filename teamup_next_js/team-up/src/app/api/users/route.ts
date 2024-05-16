@@ -5,6 +5,7 @@ import mongoose from 'mongoose'; // Import mongoose
 const MONGO_URI = 'mongodb://localhost:27017/teamup';
 
 export async function GET(request: NextRequest) {
+  
   try {
     // Connect to MongoDB before using the User model
     await mongoose.connect(MONGO_URI);

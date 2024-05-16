@@ -1,41 +1,60 @@
 import React,{useState,useEffect} from 'react';
-import {Box, Paper, Stack} from '@mui/material';
+import {Box, Checkbox, FormControlLabel, FormGroup, Paper, Stack} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
 // import Box from '@mui/material/Box';
 // import Paper from '@mui/material/Paper';
 // import Stack from '@mui/material/Stack';
 
-export default function Task() {
-  // making task responsive
-  const [winWidth, setWidth] = useState(0);
-  const [winHeight, setHeight] = useState(0);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWidth(window.innerWidth);
-      setHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+export default function Task(props:any) {
+  const [loading, setLoading] = React.useState(false);
+  function handleClick() {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false)
+    }, 3000);
+  }
   return (
-    <Box 
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        '& > :not(style)': {
-          m: 1,
-          width: (winWidth!==0)? winWidth*0.65 : "65vw",
-          height: 40,
-        },
-      }}
-    >
-      <Paper elevation={5} >
-      <Stack direction="row" spacing={2} >
-      <center><code>Description</code></center>
-    </Stack>
-      </Paper>
-    </Box>
+    <div className="task border-2 border-gray-400 rounded-md bg-gray-200 w-11/12 h-14 mx-auto mt-4 flex flex-row">
+          <FormGroup>
+            <FormControlLabel
+              className="ml-5 my-auto"
+              control={
+                <Checkbox
+                  disableRipple
+                  sx={{
+                    color: "black",
+                    "&.Mui-checked": {
+                      color: "black",
+                    },
+                  }}
+                  
+                />
+              }
+              label={props.desc}
+            />
+          </FormGroup>
+          <LoadingButton
+            size="small"
+            className="h-3/5 my-auto ml-auto mr-5"
+            loading = {loading}
+            loadingPosition="start"
+            startIcon={<SaveIcon />}
+            variant="contained"
+            onClick={handleClick}
+            sx={{
+              color:'white',
+              borderColor:'gray',
+              background:'black',
+              '&:hover':{
+                color:'white',
+                background:'black',
+                borderColor:'black'
+              }
+            }}
+          >
+            Submit
+          </LoadingButton>
+        </div>
   );
 }
