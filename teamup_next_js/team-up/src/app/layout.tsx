@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import mongoose from "mongoose";
 // import { useEffect } from "react";
 // import { connectDB } from "../../config/db";
 
@@ -16,16 +17,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // useEffect(() => {
-  //   const connect = async () => await connectDB();
-  //   connect();
-  // }, []);
+  // const connect = async () =>{
+  //   await mongoose.connect(process.env.MONGODB_URI ?? "");
+  //   console.log('mongodb connected');
+  // }
+  // connect();
   return (
     <html lang="en">
       {/* <body> */}
-      <body >
-          {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -55,10 +55,8 @@ const Home = () => {
   }, []);
   
   const pageCode = (
-    <div className="w-screen">
-      {/* Home */}
-      {/* <br /> */}
-      {/* <UserInfo/> */}
+    <div className={"w-screen" + ((userInfo.name && userInfo.emailId)?"":" hidden")}>
+      <div className={'h-full w-full'+((userInfo.name && userInfo.emailId)?" hidden":"")}> <span className="m-auto font-mono"> Loading... </span> </div>
       <div className="container w-full flex flex-row">
         <Sidebar funcToPass={funcToPass} createTeamToggle={createTeamToggle} />
         <div className="mainFrame flex flex-row" >
@@ -72,7 +70,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {(createTeamToggle)?<CreateTeamPage toggle={true} setCreateTeamToggle={setCreateTeamToggle}/>:<></>}
+      {(createTeamToggle)?<CreateTeamPage toggle={true} userDetail = {userInfo} setCreateTeamToggle={setCreateTeamToggle}/>:<></>}
       {/* <CreateTeamPage toggle={createTeamToggle} /> */}
     </div>
   );
