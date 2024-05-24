@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Project } from '../../../../models/projectModel';
 import { User } from '../../../../models/userModel';
 import mongoose from 'mongoose'; // Import mongoose
-
-const MONGO_URI = 'mongodb://localhost:27017/teamup';
-
 // export async function POST(request: NextRequest) {
 //     try {
 //         // Connect to MongoDB before using the User model
@@ -52,32 +50,41 @@ const MONGO_URI = 'mongodb://localhost:27017/teamup';
 // }
 
 // Connect to MongoDB (establish the connection only once)
-mongoose.connect(MONGO_URI);
 
 export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json(); // Parse the JSON data from the request body
+    // await mongoose.connect(process.env.MONGODB_URI+'');
+    // if(await mongoose.connect(process.env.MONGODB_URI+'')){
 
-        const userData = {
-            firstName: body.firstName || null,
-            lastName: body.lastName || null,
-            username: body.username || null,
-            password: body.password || null,
-            emailId: body.emailId || null,
-            projects: body.projects || null,
-            tasks: body.tasks || null,
-            contributions: body.contributions || null,
-        };
-
-        // Validate and sanitize input data (e.g., check for required fields)
-
-        // console.log(userData)
-        const newUser = new User(userData);
-        await newUser.save();
-
-        return NextResponse.json({ message: 'User created successfully!', user: newUser }, { status: 201 });
-    } catch (error) {
-        console.error('Error during user creation:', error);
-        return NextResponse.json({ message: 'Error creating users' }, { status: 500 });
-    }
+        try {
+            const body = await request.json(); // Parse the JSON data from the request body
+            const projectData = {
+                title: body.title || null,
+                description: body.description || null,
+                owner: body.owner || null,
+                maintainers: body.maintainers || null,
+                contributors: body.contributors || null,
+                tasks: body.tasks || null,
+                contributions: body.contributions || null,
+            };
+            const newProject = new Project(projectData);
+            const projectCreated = await newProject.save();
+            if(await projectCreated) {
+                // const usersUpdated = async()=>{
+    
+                // console.log('project created!')
+                // console.log('current user list to be dealt: ', contributorEmailId)
+                projectData.contributors.forEach(async(contributorEmailId:string)=>{
+                    const updatedUser =  await User.findOneAndUpdate({emailId:contributorEmailId},{$push:{projects:projectCreated._id}})
+                    // console.log('user updated: ', await updatedUser);
+                })
+                // return resolve();
+                return NextResponse.json({ message: 'Project created successfully!', project: newProject }, { status: 201 });
+            }
+            return NextResponse.json({ message: 'Project created successfully!', project: newProject }, { status: 404 });
+    
+        } catch (error) {
+            console.error('Error during project creation:', error);
+            return NextResponse.json({ message: 'Error creating project' }, { status: 500 });
+        }
+    // }
 }

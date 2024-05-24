@@ -4,9 +4,9 @@ import mongoose from 'mongoose'; // Import mongoose
 
 export async function GET(request: NextRequest) {
 
-  await mongoose.connect(process.env.MONGODB_URI ?? '');
-  if (await mongoose.connect(process.env.MONGODB_URI ?? '')) {
-    console.log('mongo connected')
+  // await mongoose.connect(process.env.MONGODB_URI + '');
+  // if (await mongoose.connect(process.env.MONGODB_URI + '')) {
+    // console.log('mongo connected')
     try {
       // Connect to MongoDB before using the User model
 
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Error fetching users' }, { status: 500 });
     } finally {
       // Close the connection if needed (optional)
-      await mongoose.disconnect();
+      // await mongoose.disconnect();
     }
-  }
+  // }
 }

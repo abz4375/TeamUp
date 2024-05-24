@@ -8,17 +8,17 @@ const projectSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  
-  profilePic: {
-    type: String,
+  owner: {
+    type: String, // email of owner
+    required: [true, 'Please add owner'],
   },
-  // isGoogleLinked: {
-  //   type: Boolean,
-  //   required:true
-  // },
-  projects: {
-    type: Array,
-    // required: [true, 'Please add projects'],
+  maintainers: {
+    type: Array, // array of emails
+    required: [true, 'Please add maintainers'],
+  },
+  contributors: {
+    type: Array, // array of emails
+    required: [true, 'Please add contributors'],
   },
   tasks: {
     type: Array,
@@ -54,5 +54,5 @@ const projectSchema = new mongoose.Schema({
 // };
 
 
-export const User = mongoose.models.User || mongoose.model('User', userSchema);
+export const Project = mongoose.models.Project || mongoose.model('Project', projectSchema);
 

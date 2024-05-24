@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '../../../../models/userModel';
-import mongoose from 'mongoose'; // Import mongoose
-
-const MONGO_URI = 'mongodb://localhost:27017/teamup';
 
 // export async function POST(request: NextRequest) {
 //     try {
@@ -52,7 +49,7 @@ const MONGO_URI = 'mongodb://localhost:27017/teamup';
 // }
 
 // Connect to MongoDB (establish the connection only once)
-mongoose.connect(MONGO_URI);
+// mongoose.connect(MONGO_URI);
 
 export async function POST(request: NextRequest) {
     try {

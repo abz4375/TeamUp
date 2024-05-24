@@ -10,7 +10,7 @@ export async function GET(request:NextRequest) {
     // Find user in Database
     try {
         // Connect to MongoDB before using the User model
-        await mongoose.connect(process.env.MONGODB_URI+'');
+        // await mongoose.connect(process.env.MONGODB_URI+'');
         const user = await User.find({emailId:googleUser?.email}); // Find users based on the filter
     
         if (!user.length) {
@@ -19,9 +19,9 @@ export async function GET(request:NextRequest) {
                 name: googleUser?.name,
                 emailId: googleUser?.email,
                 profilePic: googleUser?.image,
-                projects: null,
-                tasks: null,
-                contributions: null
+                projects: [],
+                tasks: [],
+                contributions: []
             });
             const userToSend = await newUser.save();
             return NextResponse.json(userToSend, { status: 200 });
@@ -32,7 +32,7 @@ export async function GET(request:NextRequest) {
         return NextResponse.json({ message: 'Error fetching User\'s Info' }, { status: 500 });
       } finally {
         // Close the connection if needed (optional)
-        await mongoose.disconnect();
+        // await mongoose.disconnect();
       }
     // return NextResponse.json({ user: session?.user }, { status: 200 });
 }

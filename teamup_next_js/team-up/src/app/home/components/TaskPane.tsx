@@ -58,19 +58,19 @@ export default function TaskPane(props:any) {
   // }, []);
 
   return (
-    <Box
-      className="mx-auto border-none border-red-500 w-full grid px-2"
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        "& > :not(style)": {
-          m: 1,
-          // width: '100%',
-          // height: '60%',
-        },
-      }}
-    >
-      <div className="w-full h-full pt-2 pb-4 paperTask border-2 border-gray-300 rounded-lg grid bg-gray-50">
+    // <Box
+    //   className="mx-auto ml-3 border-none border-red-500 w-full grid overflow-hidden pl-2"
+    //   sx={{
+    //     display: "flex",
+    //     flexWrap: "wrap",
+    //     "& > :not(style)": {
+    //       // m: 1,
+    //       // width: '100%',
+    //       // height: '60%',
+    //     },
+    //   }}
+    // >
+      <div className=" ml-5 mt-2 mr-1 w-full h-full pt-2 pb-4 paperTask border-2 border-gray-300 rounded-lg grid bg-gray-50 overflow-auto mx-auto">
         {/* <Paper elevation={0} className=' paperTask border-r-2 border-gray-400' > */}
         {/* <Stack
           direction="column"
@@ -158,6 +158,6 @@ export default function TaskPane(props:any) {
         {/* </Pape
         r> */}
       </div>
-    </Box>
+    // </Box>
   );
 }

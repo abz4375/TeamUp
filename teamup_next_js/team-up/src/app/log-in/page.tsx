@@ -74,10 +74,10 @@ const Login = () => {
         <div className=" flex m-auto my-2 mt-8">
           <img src={logo.src} alt="logo" className=" w-10 h-10 mx-2 my-2" />
           <span className=" mx-auto my-2 text-3xl font-light">
-           Welcome back to <span className=" font-semibold">Team Up</span>!
+           Welcome to <span className=" font-semibold">Team Up</span>!
           </span>
         </div>
-        {/* --------------------- EMAIL AUTH ---------------- */}
+        {/* --------------------- EMAIL AUTH ----------------
         <form action={()=>{}} className=" mx-auto my-2 grid">
           <input
             type="text"
@@ -85,19 +85,19 @@ const Login = () => {
             placeholder="Email"
             className="mx-auto my-2 w-50 border-gray-300 border-2 px-4 py-2 rounded-md focus:outline-blue-300"
           />
-          {/* <input
+          <input
             type="password"
             name="password"
             placeholder="Password..."
             className="mx-auto my-2 w-50 border-gray-300 border-2 px-4 py-2 rounded-md focus:outline-blue-300"
-          /> */}
+          />
           <button
             type="submit"
             className=" mx-auto my-2 w-full bg-blue-500 px-4 py-2 text-white rounded-md  active:bg-blue-600 transition"
           >
             Log In
           </button>
-        </form>
+        </form> */}
         <hr className=" w-1/2 border-gray-400 my-0 m-auto" />
         <form action={signInBtnFunc} className=" mx-auto my-2 grid mb-8">
           <button

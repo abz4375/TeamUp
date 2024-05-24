@@ -17,11 +17,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const connect = async () =>{
-  //   await mongoose.connect(process.env.MONGODB_URI ?? "");
-  //   console.log('mongodb connected');
-  // }
-  // connect();
+  const connect = async () =>{
+    await mongoose.connect(process.env.MONGODB_URI + "");
+    // console.log('mongodb connected');
+
+  }
+  connect();
   return (
     <html lang="en">
       {/* <body> */}

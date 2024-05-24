@@ -20,11 +20,15 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
+import LoadingButton from '@mui/lab/LoadingButton';
+
 function CreateTeamPage(props: any) {
   const [userSearchTerm, setUserSearchTerm] = React.useState("");
   const [users, setUsers] = React.useState<any>([{ empty: true }]);
   const [emptyList, setEmptyList] = React.useState("");
   const [fetchAgain, setFetchAgain] = React.useState(false);
+  const [projectTitle, setProjectTitle] = React.useState('');
+  const [awaitSubmit, setAwaitSubmit] = React.useState(false);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -90,8 +94,45 @@ function CreateTeamPage(props: any) {
     // console.log("currpage is: ", currentPage);
   };
 
-  const handleSubmit = () => {
-    handleClose();
+  const handleSubmit = async() => {
+    setAwaitSubmit(true);
+    const contributors = [...new Set(value.map(user => user.emailId))];
+    const data = {
+      title: projectTitle,
+      description: projDescMarkdown,
+      owner: props.userDetail.emailId,
+      maintainers: [props.userDetail.emailId],
+      contributors: contributors,
+      tasks: [],
+      contributions: []
+    };
+    if(((!data.title)||(data.title==='')) && (data.contributors.length===1)) {setAwaitSubmit(false);return;}
+    const url = "http://localhost:3000/api/create-project";
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    //   console.log(response);
+
+      if (response.status===201) {
+        // const responseJson = await response.json();
+        // console.log("Signup successful:", responseJson);
+        // Handle successful signup (e.g., redirect to login page)
+        setAwaitSubmit(false);
+        props.setRefreshHomePage(true);
+        handleClose();
+      } else {
+        console.error("Project Creation failed:", response.statusText);
+        setAwaitSubmit(false);
+        // Handle signup errors (e.g., display error message)
+      }
+    } catch (error) {
+      setAwaitSubmit(false);
+      console.error("Error creating Project:", error);
+      // Handle network or other errors
+    }
   }
 
   const fixedOptions = [top100Films[6]];
@@ -161,6 +202,7 @@ function CreateTeamPage(props: any) {
                     name="projectTitle"
                     placeholder="Project Title"
                     className="my-auto w-3/4 border-gray-300 border-2 px-4 py-2 rounded-md focus:outline-blue-300 transition"
+                    onChange={(e)=>setProjectTitle(e.target.value)}
                   />
                 </div>
                 <div className="mx-auto my-2 flex flex-row text-lg w-full">
@@ -336,7 +378,7 @@ function CreateTeamPage(props: any) {
                   return( <Tooltip title={member.emailId}><Chip label={member.name}
                     avatar={<Avatar src={member.profilePic} />}
                     id={index}
-                    className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75"/></Tooltip>);
+                    className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75 hover:bg-green-100"/></Tooltip>);
                 })}
               </div>
               </form>
@@ -380,16 +422,26 @@ function CreateTeamPage(props: any) {
                     <ChevronRightIcon className=" border-none border-red-500 my-auto h-full" />
                   </button>
                 ) : (
-                  <button
-                    className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-green-600 px-4 py-2 text-white rounded-md  active:bg-green-700 transition flex flex-row "
-                    onClick={handleSubmit}
-                  >
-                    <DoneIcon
-                      className="my-auto h-4/5 mr-1"
-                      style={{ marginLeft: "-0.5rem" }}
-                    />
-                    Submit
-                  </button>
+                  // <button
+                  //   className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-green-600 px-4 py-2 text-white rounded-md  active:bg-green-700 transition flex flex-row "
+                  //   onClick={handleSubmit}
+                  // >
+                  //   <DoneIcon
+                  //     className="my-auto h-4/5 mr-1"
+                  //     style={{ marginLeft: "-0.5rem" }}
+                  //   />
+                  //   Submit
+                  // </button>
+                  <LoadingButton
+                  className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-green-600 px-4 py-2 text-white rounded-md  active:bg-green-700 transition hover:bg-green-600"
+                  loading={awaitSubmit}
+                  loadingPosition="start"
+                  startIcon={<DoneIcon />}
+                  onClick={handleSubmit}
+                  // variant="outlined"
+                >
+                  Submit
+                </LoadingButton>
                 )}
               </Tooltip>
             </div>
