@@ -464,41 +464,50 @@ function DeleteProjectPage(props: any) {
   const onDelete = async () => {
     if (!toDelete.length) return;
     console.log("projects to delete: ", toDelete);
-    let i = 0;
-    while (i < toDelete.length) {
-      const url = "http://localhost:3000/api/project";
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            toDelete: [toDelete[i]],
-            toLeave: null,
-            userEmail: props.userDetail.emailId,
-          }),
+    
+    setAwaitSubmit(true); // Show loading state
+  
+    try {
+      const response = await fetch("http://localhost:3000/api/project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toDelete: toDelete,
+          toLeave: null,
+          userEmail: props.userDetail.emailId,
+        }),
+      });
+  
+      if (response.status === 200) {
+        // Update local state
+        const updatedProjects = props.userDetail.projects.filter(
+          (projectId:any) => !toDelete.includes(projectId)
+        );
+        props.setUserDetail({
+          ...props.userDetail,
+          projects: updatedProjects,
         });
-        //   console.log(response);
-
-        if (response.status === 200) {
-          // const responseJson = await response.json();
-          // console.log("Signup successful:", responseJson);
-          // Handle successful signup (e.g., redirect to login page)
-          // setFetchAgain(true);
-          props.setRefreshHomePage(true);
-          i = i + 1;
-          // handleClose();
-        } else {
-          console.error("Project Deletion failed:", response.statusText);
-          // setAwaitSubmit(false);
-          // Handle signup errors (e.g., display error message)
-        }
-      } catch (error) {
-        // setAwaitSubmit(false);
-        console.error("Error deleting Project:", error);
-        // Handle network or other errors
+  
+        // Clear the toDelete array
+        setToDelete([]);
+  
+        // Trigger refresh of home page
+        props.setRefreshHomePage(true);
+  
+        // Show success message
+        alert("Projects deleted successfully");
+      } else {
+        console.error("Project Deletion failed:", response.statusText);
+        alert("Failed to delete projects. Please try again.");
       }
+    } catch (error) {
+      console.error("Error deleting Project:", error);
+      // alert("An error occurred while deleting projects. Please try again.");
+    } finally {
+      setAwaitSubmit(false); // Hide loading state
     }
   };
+  
 
   const onLeave = async () => {
     if (!toLeave.length) return;

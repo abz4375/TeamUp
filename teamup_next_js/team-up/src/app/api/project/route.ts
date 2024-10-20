@@ -98,55 +98,67 @@ export async function POST(request: NextRequest) {
 
   if (toDelete) {
     console.log('toDelete part executed')
-    // console.log(toDelete)
-    toDelete.forEach(async (projectId: any) => {
-      const project = await Project.findOne({ _id: projectId });
-      const contributors = project.contributors;
-      contributors.forEach(async (emailId: any) => {
-        console.log('iteration for proj ', await projectId)
-        const user = await User.findOne({ emailId: emailId });
-        console.log('contributor: ', emailId)
-        const index = user.projects.indexOf(projectId);
-        console.log('index: ', index)
-        console.log('spliced index ', index)
-        if (index > -1) {
-          user.projects.splice(user.projects.indexOf(projectId), 1);
-          await user.save();
-          console.log('saved user projects: ', user.projects)
+    try {
+      for (const projectId of toDelete) {
+        const project = await Project.findOne({ _id: projectId });
+        if (!project) continue;
+        
+        for (const contributorEmail of project.contributors) {
+          const user = await User.findOne({ emailId: contributorEmail });
+          if (!user) continue;
+          
+          const index = user.projects.indexOf(projectId);
+          if (index > -1) {
+            user.projects.splice(index, 1);
+            await user.save();
+          }
         }
+        
         await Project.deleteOne({ _id: projectId });
       }
-      )
+      return NextResponse.json({ message: 'success' }, { status: 200 });
+    } catch (error) {
+      console.error('Error in toDelete:', error);
+      return NextResponse.json({ message: 'Error in deletion process' }, { status: 500 });
     }
-    );
-    return NextResponse.json({ message: 'success' }, { status: 200 });
   }
+
   if (toLeave) {
     console.log('toLeave part executed')
-    toLeave.forEach(async (projectId: any) => {
-      const project = await Project.findOne({ _id: projectId });
-      const maintainers = project.maintainers;
-      if (maintainers.indexOf(emailId) > -1) {
-        if (maintainers.length === 1) maintainers.push(project.owner);
-        maintainers.splice(maintainers.indexOf(emailId), 1);
+    try {
+      for (const projectId of toLeave) {
+        const project = await Project.findOne({ _id: projectId });
+        if (!project) continue;
+
+        const maintainers = project.maintainers;
+        if (maintainers.indexOf(emailId) > -1) {
+          if (maintainers.length === 1) maintainers.push(project.owner);
+          maintainers.splice(maintainers.indexOf(emailId), 1);
+        }
+
+        const contributors = project.contributors;
+        const contributorIndex = contributors.indexOf(emailId);
+        if (contributorIndex > -1) {
+          contributors.splice(contributorIndex, 1);
+        }
+
+        await project.save();
+
+        const user = await User.findOne({ emailId: emailId });
+        if (user) {
+          const index = user.projects.indexOf(projectId);
+          if (index > -1) {
+            user.projects.splice(index, 1);
+            await user.save();
+          }
+        }
       }
-
-      const contributors = project.contributors;
-      contributors.splice(contributors.indexOf(emailId), 1);
-
-      project.save();
-
-      const user = await User.findOne({ emailId: emailId });
-      const index = user.projects.indexOf(projectId);
-      if (index > -1) {
-        user.projects.splice(index, 1);
-        user.save();
-      }
-    });
-    return NextResponse.json({ message: 'success' }, { status: 200 });
+      return NextResponse.json({ message: 'success' }, { status: 200 });
+    } catch (error) {
+      console.error('Error in toLeave:', error);
+      return NextResponse.json({ message: 'Error in leaving process' }, { status: 500 });
+    }
   }
 
-  if (!toLeave && !toDelete)
-    // console.log('got the array : ');
-    return NextResponse.json({ message: 'Error in API' }, { status: 500 });
+  return NextResponse.json({ message: 'No action performed' }, { status: 400 });
 }
