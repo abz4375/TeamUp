@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '../../../../../models/userModel';
-
+/*
 // export async function POST(request: NextRequest) {
 //     try {
 //         // Connect to MongoDB before using the User model
@@ -50,7 +50,7 @@ import { User } from '../../../../../models/userModel';
 
 // Connect to MongoDB (establish the connection only once)
 // mongoose.connect(MONGO_URI);
-
+*/
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json(); // Parse the JSON data from the request body
@@ -65,10 +65,11 @@ export async function POST(request: NextRequest) {
             tasks: null,
             contributions: null,
         };
-
+        /*
         // Validate and sanitize input data (e.g., check for required fields)
 
         // console.log(userData)
+        */
         const newUser = new User(userData);
         await newUser.save();
 

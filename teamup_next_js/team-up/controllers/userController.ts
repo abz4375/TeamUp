@@ -1,3 +1,4 @@
+/*
 const asyncHandler = require ('express-async-handler')
 
 const User = require('../models/userModel')
@@ -33,3 +34,5 @@ export const deleteUser = asyncHandler(async(req: any, res: any) => {
 //     setUser,
 //     deleteUser
 // }
+
+*/

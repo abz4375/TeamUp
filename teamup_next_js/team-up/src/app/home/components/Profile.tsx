@@ -11,32 +11,23 @@ import {
   Typography,
   Tooltip,
 } from "@mui/material";
-// import Box from '@mui/material/Box';
-// import Avatar from '@mui/material/Avatar';
-// import Menu from '@mui/material/Menu';
-// import MenuItem from '@mui/material/MenuItem';
-// import ListItemIcon from '@mui/material/ListItemIcon';
-// import Divider from '@mui/material/Divider';
-// import IconButton from '@mui/material/IconButton';
-// import Typography from '@mui/material/Typography';
-// import Tooltip from '@mui/material/Tooltip';
-import PersonAdd from "@mui/icons-material/PersonAdd";
-import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
-
 import { signOutBtnFunc } from "./signOut";
-
 import './profile.css';
 import { red } from "@mui/material/colors";
 
-// interface ProfileProps {
-//   userInfo: any;
-// }
+interface ProfileProps {
+  userInfo: {
+    name: string;
+    profilePic: string;
+  };
+  isDarkMode: boolean;
+}
 
-export default function Profile(props: any) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+export default function Profile({ userInfo, isDarkMode }: ProfileProps) {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -44,10 +35,8 @@ export default function Profile(props: any) {
   };
 
   const handleLogout = async () => {
-    // await signOut({redirectTo:'/log-in'});
     document.getElementById("LogOutBtn")?.click();
   };
-  // console.log('props recieved:' , props.userInfo)
 
   return (
     <React.Fragment>
@@ -60,9 +49,7 @@ export default function Profile(props: any) {
           textAlign: "center",
         }}
       >
-        <Typography sx={{ minWidth: 0 }}></Typography>
-        <Typography sx={{ minWidth: 0 }}></Typography>
-        <Tooltip title={props.userInfo.name}>
+        <Tooltip title={userInfo.name}>
           <IconButton
             onClick={handleClick}
             size="small"
@@ -72,14 +59,14 @@ export default function Profile(props: any) {
             aria-expanded={open ? "true" : undefined}
           >
             <Avatar
-              src={props.userInfo.profilePic}
+              src={userInfo.profilePic}
               sx={{ width: 42, height: 42 }}
-            ></Avatar>
+            />
           </IconButton>
         </Tooltip>
       </Box>
       <Menu
-      className=" menuProfile"
+        className={`menuProfile ${isDarkMode ? 'dark' : ''}`}
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
@@ -88,10 +75,12 @@ export default function Profile(props: any) {
         PaperProps={{
           elevation: 0,
           sx: {
-            borderRadius:'0.5rem',
+            borderRadius: '0.5rem',
             overflow: "visible",
             filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
             mt: 1.5,
+            bgcolor: isDarkMode ? 'rgb(31, 41, 55)' : 'background.paper',
+            color: isDarkMode ? 'rgb(229, 231, 235)' : 'inherit',
             "& .MuiAvatar-root": {
               width: 32,
               height: 32,
@@ -106,7 +95,7 @@ export default function Profile(props: any) {
               right: 14,
               width: 10,
               height: 10,
-              bgcolor: "background.paper",
+              bgcolor: isDarkMode ? 'rgb(31, 41, 55)' : 'background.paper',
               transform: "translateY(-50%) rotate(45deg)",
               zIndex: 0,
             },
@@ -115,28 +104,24 @@ export default function Profile(props: any) {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem disableRipple disableTouchRipple className="flex hover:bg-white m-1 rounded">
-          {/* <Avatar src={props.userInfo.image} /> {props.userInfo.name} */}
-          <span className="m-auto font-bold">{props.userInfo.name}</span>
+        <MenuItem disableRipple disableTouchRipple className={`flex m-1 rounded ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}>
+          <span className="m-auto font-bold">{userInfo.name}</span>
         </MenuItem>
-        <MenuItem onClick={handleClose} className="hover:bg-gray-200 m-1 rounded">
+        <MenuItem onClick={handleClose} className={`m-1 rounded ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}>
           <Avatar /> Manage Profile
         </MenuItem>
-        <Divider />
-        {/* <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <PersonAdd fontSize="small" />
-          </ListItemIcon>
-          Add another account
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Settings
-        </MenuItem> */}
-        <MenuItem disableRipple disableTouchRipple onClick={handleLogout} className="hover:bg-red-50 active:bg-red-100 m-1 mb-0 rounded transition text-red-700 text-lg flex">
-          <ListItemIcon sx={{color:red[700]}}>
+        <Divider sx={{ bgcolor: isDarkMode ? 'rgb(75, 85, 99)' : 'inherit' }} />
+        <MenuItem 
+          disableRipple 
+          disableTouchRipple 
+          onClick={handleLogout} 
+          className={`m-1 mb-0 rounded transition text-lg flex ${
+            isDarkMode 
+              ? 'hover:bg-red-900 active:bg-red-800 text-white' 
+              : 'hover:bg-red-50 active:bg-red-100 text-red-700'
+          }`}
+        >
+          <ListItemIcon sx={{color: isDarkMode ? 'rgb(248, 113, 113)' : red[700]}}>
             <Logout fontSize="small" />
           </ListItemIcon>
           <span className="mx-auto ml-1">Logout</span>

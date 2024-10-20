@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Project } from '../../../../models/projectModel';
 import { User } from '../../../../models/userModel';
+/*
 import mongoose from 'mongoose'; // Import mongoose
 // export async function POST(request: NextRequest) {
 //     try {
@@ -50,10 +51,14 @@ import mongoose from 'mongoose'; // Import mongoose
 // }
 
 // Connect to MongoDB (establish the connection only once)
+*/
 
 export async function POST(request: NextRequest) {
-    // await mongoose.connect(process.env.MONGODB_URI+'');
-    // if(await mongoose.connect(process.env.MONGODB_URI+'')){
+    
+    /*
+    await mongoose.connect(process.env.MONGODB_URI+'');
+    if(await mongoose.connect(process.env.MONGODB_URI+'')){
+    */
 
         try {
             const body = await request.json(); // Parse the JSON data from the request body
@@ -69,10 +74,12 @@ export async function POST(request: NextRequest) {
             const newProject = new Project(projectData);
             const projectCreated = await newProject.save();
             if(await projectCreated) {
+                /*
                 // const usersUpdated = async()=>{
     
                 // console.log('project created!')
                 // console.log('current user list to be dealt: ', contributorEmailId)
+                */
                 projectData.contributors.forEach(async(contributorEmailId:string)=>{
                     const updatedUser =  await User.findOneAndUpdate({emailId:contributorEmailId},{$push:{projects:projectCreated._id}})
                     // console.log('user updated: ', await updatedUser);

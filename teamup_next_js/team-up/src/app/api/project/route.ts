@@ -1,76 +1,152 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Project } from '../../../../models/projectModel';
-import mongoose from 'mongoose'; // Import mongoose
 import { User } from '../../../../models/userModel';
+/*
 // const mongoose = require('mongoose');
 
 // mongoose.connect(process.env.MONGODB_URI+'')
 //   .then(() => console.log('mongo connected'))
 //   .catch(err => console.error('Error connecting to MongoDB:', err));
-
+*/
 export async function GET(request: NextRequest) {
 
+  /*
   // .then(() => console.log('mongo connected'))
   // .catch(err => console.error('Error connecting to MongoDB:', err));
+  */
+
   try {
+    /*
     // Connect to MongoDB before using the User model
     // await mongoose.connect(process.env.MONGODB_URI+'')
     // console.log('mongo connected')
-
-      const queryParams = new URLSearchParams(request.nextUrl.searchParams);
-      // const id: any = queryParams.get('id') || null;
-      // const firstName: any = queryParams.get('firstName') || null; // Get first-name param (optional)
-      // const lastName: any = queryParams.get('lastName') || null;
-      // const username: any = queryParams.get('username'); // Get username param (optional)
-      // const password: any = queryParams.get('password') || null;
-      // const emailId: any = queryParams.get('emailId') || null;
-      // const projects: any = queryParams.get('projects') || null;
-      // const tasks: any = queryParams.get('tasks') || null;
-      // const contributions: any = queryParams.get('contributions') || null;
-      const id: any = queryParams.get('id') || null;
-      const info: any = queryParams.get('info') || null;
+    */
+    const queryParams = new URLSearchParams(request.nextUrl.searchParams);
+    /*
+    // const id: any = queryParams.get('id') || null;
+    // const firstName: any = queryParams.get('firstName') || null; // Get first-name param (optional)
+    // const lastName: any = queryParams.get('lastName') || null;
+    // const username: any = queryParams.get('username'); // Get username param (optional)
+    // const password: any = queryParams.get('password') || null;
+    // const emailId: any = queryParams.get('emailId') || null;
+    // const projects: any = queryParams.get('projects') || null;
+    // const tasks: any = queryParams.get('tasks') || null;
+    // const contributions: any = queryParams.get('contributions') || null;
+    */
+// Retrieves 'id' and 'info' values from URL query parameters, defaulting to null if not found.
+    const id: any = queryParams.get('id') || null;
+    const info: any = queryParams.get('info') || null;
+    /*
     //   const searchTermRegex = new RegExp(searchTerm);
-      // console.log('search term regex: ',searchTermRegex)
-      // console.log('search term: ', searchTerm)
+    // console.log('search term regex: ',searchTermRegex)
+    // console.log('search term: ', searchTerm)
+    
 
-      // Build the filter object based on user input
-      const filter: any = {}; // Define filter with User interface
-      // if (id) filter.id = id;
-      // if (firstName) {
-      //   filter.firstName = firstName;
-      // }
-      // if (lastName) {
-      //   filter.lastName = lastName;
-      // }
-      // if (username) filter.username = username;
-      // if (password) filter.password = password;
-      // if (emailId) filter.emailId = emailId;
-      // if (projects) filter.projects = projects;
-      // if (tasks) filter.tasks = tasks;
-      // if (contributions) filter.contributions = contributions;
-      if (id) filter._id = id;
-      
-      // console.log("query given: ", filter)
-      const project = await Project.find(filter); // Find users based on the filter
+    // Build the filter object based on user input
+    */
+    const filter: any = {}; // Define filter with User interface
+    /*
+    // if (id) filter.id = id;
+    // if (firstName) {
+    //   filter.firstName = firstName;
+    // }
+    // if (lastName) {
+    //   filter.lastName = lastName;
+    // }
+    // if (username) filter.username = username;
+    // if (password) filter.password = password;
+    // if (emailId) filter.emailId = emailId;
+    // if (projects) filter.projects = projects;
+    // if (tasks) filter.tasks = tasks;
+    // if (contributions) filter.contributions = contributions;
+    */
 
-      if (!project.length) {
-        return NextResponse.json({ message: 'Invalid Project ID' }, { status: 404 });
+    if (id) filter._id = id;
+
+    // console.log("query given: ", filter)
+    const project = await Project.find(filter); // Find users based on the filter
+
+    if (!project.length) {
+      return NextResponse.json({ message: 'Invalid Project ID' }, { status: 404 });
+    }
+
+    // console.log('project is' , project)
+    if (info === 'forDashboard') {
+      const owner = await User.findOne({ emailId: await project[0]?.owner });
+      // console.log('owner is',await owner)
+      return NextResponse.json({ title: await project[0].title, ownerName: await owner.name, ownerPic: await owner.profilePic, ownerEmailId: await owner.emailId, updatedAt: await project[0].updatedAt }, { status: 200 });
+    } else if (info === 'forDeletePage') {
+      return NextResponse.json({ title: await project[0].title, owner: await project[0].owner, createdAt: await project[0].createdAt.getDate() + ' - ' + (await project[0].createdAt.getMonth() + 1) + ' - ' + (await project[0].createdAt.getYear() - 100 + 2000) }, { status: 200 });
+    }
+    else return NextResponse.json(project, { status: 200 });
+  } catch (error) {
+    // console.error(error);
+    // console.log('')
+    return NextResponse.json({ message: 'Error fetching info' }, { status: 500 });
+  } finally {
+    // Close the connection if needed (optional)
+    // await mongoose.disconnect();
+  }
+  // }
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const emailId = body.userEmail;
+  const toDelete = body.toDelete;
+  const toLeave = body.toLeave;
+
+  if (toDelete) {
+    console.log('toDelete part executed')
+    // console.log(toDelete)
+    toDelete.forEach(async (projectId: any) => {
+      const project = await Project.findOne({ _id: projectId });
+      const contributors = project.contributors;
+      contributors.forEach(async (emailId: any) => {
+        console.log('iteration for proj ', await projectId)
+        const user = await User.findOne({ emailId: emailId });
+        console.log('contributor: ', emailId)
+        const index = user.projects.indexOf(projectId);
+        console.log('index: ', index)
+        console.log('spliced index ', index)
+        if (index > -1) {
+          user.projects.splice(user.projects.indexOf(projectId), 1);
+          await user.save();
+          console.log('saved user projects: ', user.projects)
+        }
+        await Project.deleteOne({ _id: projectId });
+      }
+      )
+    }
+    );
+    return NextResponse.json({ message: 'success' }, { status: 200 });
+  }
+  if (toLeave) {
+    console.log('toLeave part executed')
+    toLeave.forEach(async (projectId: any) => {
+      const project = await Project.findOne({ _id: projectId });
+      const maintainers = project.maintainers;
+      if (maintainers.indexOf(emailId) > -1) {
+        if (maintainers.length === 1) maintainers.push(project.owner);
+        maintainers.splice(maintainers.indexOf(emailId), 1);
       }
 
-      // console.log('project is' , project)
-      if (info==='forDashboard'){
-        const owner = await User.findOne({emailId:await project[0]?.owner});
-        // console.log('owner is',await owner)
-        return NextResponse.json({ title: await project[0].title, ownerName: await owner.name, ownerPic: await owner.profilePic, ownerEmailId: await owner.emailId, updatedAt: await project[0].updatedAt }, { status: 200 });
-      } 
-      else return NextResponse.json(project, { status: 200 });
-    } catch (error) {
-      // console.error(error);
-      // console.log('')
-      return NextResponse.json({ message: 'Error fetching info' }, { status: 500 });
-    } finally {
-      // Close the connection if needed (optional)
-      // await mongoose.disconnect();
-    }
-  // }
+      const contributors = project.contributors;
+      contributors.splice(contributors.indexOf(emailId), 1);
+
+      project.save();
+
+      const user = await User.findOne({ emailId: emailId });
+      const index = user.projects.indexOf(projectId);
+      if (index > -1) {
+        user.projects.splice(index, 1);
+        user.save();
+      }
+    });
+    return NextResponse.json({ message: 'success' }, { status: 200 });
+  }
+
+  if (!toLeave && !toDelete)
+    // console.log('got the array : ');
+    return NextResponse.json({ message: 'Error in API' }, { status: 500 });
 }

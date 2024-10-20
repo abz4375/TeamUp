@@ -1,24 +1,19 @@
 .sidebar{
     width: 4.5%;
-    box-shadow: 0px 0px 5px rgba(120, 120, 120, 1);
-}
-
-.createTeam {
-    /* border-color: rgb(169, 168, 168); */
-    /* filter:drop-shadow( 0px 2px 2px rgb(146, 146, 146) ) */
+    /* box-shadow: 0px 0px 5px rgba(120, 120, 120, 1); */
 }
 
 .createTeamBtn {
     width: 3rem;
     height: 3rem;
-    box-shadow: 0px 1px 5px rgb(146,146,146);
+    /* box-shadow: 0px 1px 5px rgb(146,146,146); */
 }
 
 .createTeamBtn:hover{
-    box-shadow: 0px 3px 10px rgb(91, 91, 91);
+    box-shadow: 0px 1px 5px rgb(146,146,146);
 }
 
 .createTeamBtn:active{
-    box-shadow: 0px 1px 7px rgb(146,146,146);
-    background-color: rgb(81, 34, 0);
+    box-shadow: 0px 1px 5px rgb(146,146,146);
+    background-color: rgb(140, 0, 0);
 }

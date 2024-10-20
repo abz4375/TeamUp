@@ -56,7 +56,8 @@ const Login = () => {
 
   function handleClickGoogle() {
     setGLoading(true);
-    document.getElementsByClassName("GoogleSignInBtn")[0].click();
+    const googleSignInBtn = document.getElementsByClassName("GoogleSignInBtn")[0];
+    (googleSignInBtn as HTMLElement).click();
     setTimeout(() => {
       setGLoading(false);
     }, 3000);

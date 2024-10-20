@@ -2,13 +2,19 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { Box, Paper, Button, Stack, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import "./sidebar.css";
-// import createTeam from "../../assets/createTeam.png";
 import GroupAddRoundedIcon from '@mui/icons-material/GroupAddRounded';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import logo from "../../assets/logo.png";
-export default function Sidebar(props:any) {
-  // making sidebar responsive
+
+export default function Sidebar(props: {
+  funcToPass: (value: boolean) => void;
+  createTeamToggle: boolean;
+  setDeleteProjectPage: (value: boolean) => void;
+  deleteProjectPage: boolean;
+  isDarkMode: boolean;
+}) {
   const [winWidth, setWidth] = useState(0);
   const [winHeight, setHeight] = useState(0);
 
@@ -20,28 +26,32 @@ export default function Sidebar(props:any) {
 
     window.addEventListener("resize", handleResize);
 
-    // Cleanup function to remove event listener on unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleCreateTeam = () => {
-    // console.log(!props.createTeamToggle)
     props.funcToPass(true);
   }
 
   return (
-    <div className=" border-r-2 h-screen  flex flex-col sidebar bg-gray-50" >
-      <img src={logo.src} className="w-5/6 mx-auto mt-3" />
+    <div className={`border-r-2 h-screen flex flex-col sidebar ${props.isDarkMode ? 'bg-dark-bg' : 'bg-gray-50'}`}>
+      <img src={logo.src} className="w-5/6 mx-auto mt-3" alt="Team Up Logo" />
       <Tooltip title="Create Team">
         <button
-          className=" mx-auto mt-16 border-2 border-amber-900 rounded-full createTeamBtn bg-amber-900 transition" 
+          className={`mx-auto mt-16 border-2 rounded-full createTeamBtn transition border-amber-900 bg-amber-900`}
           onClick={handleCreateTeam}
         >
-          {/* <img
-            src={createTeam.src}
-            className=" border-2 border-gray-400 rounded-full createTeam"
-          /> */}
           <GroupAddRoundedIcon sx={{color:'white'}} className="w-3/5 h-3/5 m-auto createTeam"/>
+        </button>
+      </Tooltip>
+      <Tooltip title="Delete Project">
+        <button
+          className={`mx-auto mt-16 border-2 rounded-full createTeamBtn transition ${
+            props.isDarkMode ? 'border-red-500 bg-red-500' : 'border-red-700 bg-red-700'
+          }`}
+          onClick={() => props.setDeleteProjectPage(true)}
+        >
+          <DeleteForeverIcon sx={{color:'white'}} className="w-3/5 h-3/5 m-auto createTeam"/>
         </button>
       </Tooltip>
     </div>

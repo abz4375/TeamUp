@@ -1,13 +1,15 @@
 import mongoose from 'mongoose';
+/*
 // const bcrypt = require('bcrypt'); // Import bcrypt for hashing
 
 // const SALT_WORK_FACTOR = 10;
-
+*/
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please add name'],
   },
+  /*
   // username: {
   //   type: String,
   //   unique: true,
@@ -16,6 +18,7 @@ const userSchema = new mongoose.Schema({
   //   type: String,
   //   // required: [true, 'Please add password'],
   // },
+  */
   emailId: {
     type: String,
     required: [true, 'Please add email id'],
@@ -24,10 +27,12 @@ const userSchema = new mongoose.Schema({
   profilePic: {
     type: String,
   },
+  /*
   // isGoogleLinked: {
   //   type: Boolean,
   //   required:true
   // },
+  */
   projects: {
     type: Array,
     // required: [true, 'Please add projects'],
@@ -41,7 +46,7 @@ const userSchema = new mongoose.Schema({
     // required: [true, 'Please add contributions'],
   },
 }, { timestamps: true });
-
+/*
 // userSchema.pre('save', async function(next) {
 //   const user = this;
   
@@ -64,7 +69,7 @@ const userSchema = new mongoose.Schema({
 // userSchema.methods.matchPassword = async function(enteredPassword:string) {
 //   return await bcrypt.compare(enteredPassword, this.password);
 // };
-
+*/
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
 

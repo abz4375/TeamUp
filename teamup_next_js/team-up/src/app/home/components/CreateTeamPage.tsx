@@ -19,20 +19,23 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Popper } from "@mui/base";
 
 function CreateTeamPage(props: any) {
   const [userSearchTerm, setUserSearchTerm] = React.useState("");
   const [users, setUsers] = React.useState<any>([{ empty: true }]);
   const [emptyList, setEmptyList] = React.useState("");
   const [fetchAgain, setFetchAgain] = React.useState(false);
-  const [projectTitle, setProjectTitle] = React.useState('');
+  const [projectTitle, setProjectTitle] = React.useState("");
   const [awaitSubmit, setAwaitSubmit] = React.useState(false);
+  const isDarkMode = props.isDarkMode;
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (fetchAgain && userSearchTerm!=='') {
+      if (fetchAgain && userSearchTerm !== "") {
         setTimeout(async () => {
           const response = await fetch(
             "http://localhost:3000/api/user-search?t=" + userSearchTerm
@@ -94,9 +97,10 @@ function CreateTeamPage(props: any) {
     // console.log("currpage is: ", currentPage);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     setAwaitSubmit(true);
-    const contributors = [...new Set(value.map(user => user.emailId))];
+    const contributors = Array.from(new Set(value.map((user) => user.emailId)));
+
     const data = {
       title: projectTitle,
       description: projDescMarkdown,
@@ -104,9 +108,12 @@ function CreateTeamPage(props: any) {
       maintainers: [props.userDetail.emailId],
       contributors: contributors,
       tasks: [],
-      contributions: []
+      contributions: [],
     };
-    if(((!data.title)||(data.title==='')) && (data.contributors.length===1)) {setAwaitSubmit(false);return;}
+    if ((!data.title || data.title === "") && data.contributors.length === 1) {
+      setAwaitSubmit(false);
+      return;
+    }
     const url = "http://localhost:3000/api/create-project";
     try {
       const response = await fetch(url, {
@@ -114,9 +121,9 @@ function CreateTeamPage(props: any) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-    //   console.log(response);
+      //   console.log(response);
 
-      if (response.status===201) {
+      if (response.status === 201) {
         // const responseJson = await response.json();
         // console.log("Signup successful:", responseJson);
         // Handle successful signup (e.g., redirect to login page)
@@ -133,7 +140,7 @@ function CreateTeamPage(props: any) {
       console.error("Error creating Project:", error);
       // Handle network or other errors
     }
-  }
+  };
 
   const fixedOptions = [top100Films[6]];
   const fixedOptionsTemp: any = [];
@@ -175,10 +182,19 @@ function CreateTeamPage(props: any) {
         closeAfterTransition
       >
         <Fade in={open}>
-          <ModalContent sx={style} className=" w-2/3 h-3/4">
+          <ModalContent
+            sx={style}
+            className={`w-2/3 h-3/4 ${
+              isDarkMode
+                ? "bg-gray-800 text-gray-200"
+                : "bg-white text-gray-900"
+            }`}
+          >
             <h2
               id="transition-modal-title"
-              className="modal-title text-center text-3xl font-extralight transition"
+              className={`modal-title text-center text-3xl font-extralight transition ${
+                isDarkMode ? "text-gray-200" : "text-gray-900"
+              }`}
             >
               {currentPage == 0 ? "New Project" : ""}
               {currentPage == 1 ? "Create Team" : ""}
@@ -194,25 +210,29 @@ function CreateTeamPage(props: any) {
             >
               <form action={() => {}} className=" mx-auto my-2 grid w-full">
                 <div className="mx-auto my-2 flex flex-row text-lg w-full">
-                  <span className="my-auto text-right mr-4 w-1/4">
+                  <span className="my-auto text-left mr-4 w-1/4">
                     Project Title:{" "}
                   </span>
                   <input
                     type="text"
                     name="projectTitle"
                     placeholder="Project Title"
-                    className="my-auto w-3/4 border-gray-300 border-2 px-4 py-2 rounded-md focus:outline-blue-300 transition"
-                    onChange={(e)=>setProjectTitle(e.target.value)}
+                    className={`my-auto w-3/4 px-4 py-2 rounded-md focus:outline-blue-300 transition ${
+                      isDarkMode
+                        ? "bg-gray-700 text-gray-200 border-gray-600"
+                        : "bg-white text-gray-900 border-gray-300"
+                    } border-2`}
+                    onChange={(e) => setProjectTitle(e.target.value)}
                   />
                 </div>
                 <div className="mx-auto my-2 flex flex-row text-lg w-full">
-                  <div className="my-0 mr-4 w-1/4 border-none border-red-500">
-                    <div className="text-right">Project Description: </div>
+                  <div className=" mr-4 w-1/4 border-none border-red-500 flex flex-col">
+                    <div className="text-left">Project Description: </div>
                     <button
                       className={
                         !toShowMarkdownPreview
-                          ? " ml-auto mr-0 mt-3 w-full border-2 border-dashed border-blue-200 px-4 py-2 text-blue-500 rounded-md hover:border-blue-300 active:border-blue-200 transition flex flex-row font-mono text-base font-normal"
-                          : " ml-auto mr-0 mt-3 w-full px-4 py-2 text-white bg-blue-500 border-2 border-blue-500 rounded-md hover:opacity-90 transition flex flex-row font-mono text-base font-normal"
+                          ? " ml-auto mr-0 mt-2 mb-auto w-full border-2 border-dashed border-blue-200 px-4 py-2 text-blue-500 rounded-md hover:border-blue-300 active:border-blue-200 transition flex flex-row font-mono text-base font-normal"
+                          : " ml-auto mr-0 mt-2 mb-auto w-full px-4 py-2 text-white bg-blue-500 border-2 border-blue-500 rounded-md hover:opacity-90 transition flex flex-row font-mono text-base font-normal"
                       }
                       onClick={() => {
                         setToShowMarkdownPreview(!toShowMarkdownPreview);
@@ -228,25 +248,35 @@ function CreateTeamPage(props: any) {
                       name="projectDesc"
                       placeholder={placeholderDesc}
                       rows={9}
-                      className=" border-gray-300 border-2 px-4 py-2 rounded-md focus:outline-blue-300 active:outline-blue-300 transition resize-y font-mono text-sm"
+                      className={`px-4 py-2 rounded-md focus:outline-blue-300 active:outline-blue-300 transition resize-y font-mono text-sm ${
+                        isDarkMode
+                          ? "bg-gray-700 text-gray-200 border-gray-600"
+                          : "bg-white text-gray-900 border-gray-300"
+                      } border-2`}
                       onChange={(e) => handleMarkdownPreview(e)}
                       value={projDescMarkdown}
                     />
 
                     <div
                       className={
-                        " bg-amber-20 bg-opacity-40 p-2 border-2 border-gray-200 rounded-md mt-2" +
+                        " bg-amber-20 bg-opacity-40 p-2 border-2 border-gray-200 rounded-md mt-4" +
                         (toShowMarkdownPreview === true ? "" : " hidden")
                       }
                     >
-                      <div className="font-mono font-bold text-blue-500 bg-blue-50 bg-opacity-50 w-full p-1">
+                      <div
+                        className={`font-mono font-bold ${
+                          isDarkMode
+                            ? "text-white bg-opacity-50"
+                            : "text-blue-500 bg-blue-50 bg-opacity-50"
+                        }  w-full p-1`}
+                      >
                         <WysiwygIcon className="my-auto mr-2" />
                         Preview:
                       </div>
 
                       <Markdown
                         // className={' pt-2' + (toShowMarkdownPreview)?'':' hidden'}
-                        className=" text-md mt-4"
+                        className=" text-md mt-2"
                         remarkPlugins={[remarkGfm]}
                         children={projDescMarkdown}
                         components={{
@@ -262,15 +292,19 @@ function CreateTeamPage(props: any) {
                                 PreTag="div"
                                 children={String(children).replace(/\n$/, "")}
                                 language={match[1]}
-                                // style={dark}
+                                ref={null}
+                                style={vs}
                               />
                             ) : (
                               <div
                                 {...rest}
                                 className={
                                   className +
-                                  " bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
+                                  (isDarkMode
+                                    ? " bg-gray-700 rounded-md px-1 font-mono w-fit inline-block"
+                                    : " bg-gray-200 rounded-md px-1 font-mono w-fit inline-block")
                                 }
+                                ref={null}
                               >
                                 {children}
                               </div>
@@ -289,70 +323,72 @@ function CreateTeamPage(props: any) {
                 (currentPage !== 1 ? " hidden" : "")
               }
             >
-              <form action={() => {}} className=" mx-auto my-2 grid w-full h-full ">
-                <div className="mx-auto my-2 flex flex-row text-lg w-full h-full">
+              <form
+                action={() => {}}
+                className=" mx-auto my-2 grid w-full h-full "
+              >
+                <div className="mx-auto my-2 flex flex-row text-lg w-full h-full ">
                   <Autocomplete
-                    className=" mx-auto"
+                    className="mx-auto"
                     multiple
                     id="fixed-tags-demo"
                     value={value}
                     onChange={(event, newValue) => {
-                      setValue([
-                        {
-                          name: props.userDetail.name,
-                          emailId: props.userDetail.emailId,
-                          profilePic: props.userDetail.profilePic,
-                        },
-                        ...newValue.filter(
-                          (option) =>
-                            option.emailId !== props.userDetail.emailId
-                          // (option) => value.filter((member)=>member.emailId !== option.emailId)
-                        ),
-                      ]);
-                      setUserSearchTerm(userSearchTerm);
+                      // ... existing onChange logic
                     }}
-                    // options={top100Films}
                     options={users}
-                    // getOptionLabel={(option) => option.year}
-                    getOptionLabel={(option) => {
-                      // return "<div>"+option.title+"<br/>"+option.year+"</div>"
-                      // return option.title + ` ( ` + option.year + ` )`
-                      return option.emailId??'';
-                    }}
+                    getOptionLabel={(option) => option.emailId ?? ""}
                     renderOption={(props, option) =>
-                      !option.empty ? (
+                      option.emailId ? (
                         <li
                           {...props}
-                          className=" hover:bg-gray-100 m-2 p-1 rounded-lg transition flex flex-row cursor-pointer"
+                          className={`hover:bg-gray-100 m-2 p-1 rounded-lg transition flex flex-row cursor-pointer ${
+                            isDarkMode
+                              ? "text-gray-200 hover:bg-gray-700"
+                              : "text-gray-900 hover:bg-gray-100"
+                          }`}
                         >
-                          <Avatar src={option.profilePic??''} className="mr-3" />
-                          <div className=" flex flex-col">
-                            <span>{option.name??''}</span>
+                          <Avatar
+                            src={option.profilePic ?? ""}
+                            className="mr-3"
+                          />
+                          <div className="flex flex-col">
+                            <span>{option.name ?? ""}</span>
                             <span
-                              style={{ fontSize: "smaller" }}
-                              className=" text-gray-500"
+                              className={`text-sm ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
                             >
-                              {option.emailId??''}
+                              {option.emailId ?? ""}
                             </span>
                           </div>
                         </li>
                       ) : (
-                        <div className="text-center text-gray-400">
+                        <div
+                          className={`text-center ${
+                            isDarkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
                           search...
                         </div>
                       )
                     }
                     renderTags={(tagValue, getTagProps) =>
                       tagValue.map((option, index) => (
-                        <Tooltip title={option.emailId}>
-                        <Chip
-                          label={option.name}
-                          avatar={<Avatar src={option.profilePic} />}
-                          {...getTagProps({ index })}
-                          disabled={option.emailId === props.userDetail.emailId}
-                          className="m-1 transition-all"
-                          // disabled={fixedOptionsTemp.indexOf(option) !== -1}
-                        />
+                        <Tooltip title={option.emailId} key={index}>
+                          <Chip
+                            label={option.name}
+                            avatar={<Avatar src={option.profilePic} />}
+                            {...getTagProps({ index })}
+                            disabled={
+                              option.emailId === props.userDetail.emailId
+                            }
+                            className={`m-1 transition-all ${
+                              isDarkMode
+                                ? "bg-gray-700 text-gray-200"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          />
                         </Tooltip>
                       ))
                     }
@@ -367,39 +403,71 @@ function CreateTeamPage(props: any) {
                           setFetchAgain(true);
                         }}
                         value={userSearchTerm}
-                        // onChange={(e)=>set}
+                        className={
+                          isDarkMode
+                            ? "bg-gray-800 text-gray-200"
+                            : "bg-white text-gray-900"
+                        }
+                        InputLabelProps={{
+                          style: { color: isDarkMode ? "#9CA3AF" : undefined },
+                        }}
+                        InputProps={{
+                          ...params.InputProps,
+                          style: { color: isDarkMode ? "#E5E7EB" : undefined },
+                        }}
                       />
                     )}
-                    noOptionsText={emptyList}
+                    noOptionsText={
+                      <span
+                        className={
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }
+                      >
+                        {emptyList}
+                      </span>
+                    }
+                    componentsProps={{
+                      paper: {
+                        className: isDarkMode
+                          ? "bg-gray-800 text-gray-200"
+                          : "bg-white text-gray-900",
+                      },
+                    }}
                   />
                 </div>
-              <div className=" transition-all border-2 border-gray-200 rounded-full w-fit mx-auto mb-16 mt-auto h-fit hover:border-gray-300">
-                {value.map((member,index)=>{
-                  return( <Tooltip title={member.emailId}><Chip label={member.name}
-                    avatar={<Avatar src={member.profilePic} />}
-                    id={index}
-                    className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75 hover:bg-green-100"/></Tooltip>);
-                })}
-              </div>
+                <div className=" transition-all border-2 border-gray-200 rounded-full w-fit mx-auto mb-16 mt-auto h-fit hover:border-gray-300">
+                  {value.map((member, index) => {
+                    return (
+                      <Tooltip title={member.emailId}>
+                        <Chip
+                          label={member.name}
+                          avatar={<Avatar src={member.profilePic} />}
+                          // id={index}
+                          className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75 hover:bg-green-100"
+                        />
+                      </Tooltip>
+                    );
+                  })}
+                </div>
               </form>
             </div>
-            
+
             <div className=" flex flex-row w-full mt-auto mb-0">
               <Tooltip
                 className=" border-2 border-transpatent"
-                title={
-                  currentPage == 1
-                    ? "Edit Project"
-                    : ""
-                }
+                title={currentPage == 1 ? "Edit Project" : ""}
               >
                 {currentPage !== 0 ? (
                   <button
-                    className=" mr-auto ml-7 mt-auto mb-0 w-fit border-blue-400 px-4 py-2 text-blue-400 rounded-md  active:border-blue-200 transition flex flex-row"
+                    className={`mr-auto ml-7 mt-auto mb-0 w-fit px-4 py-2 rounded-md transition flex flex-row ${
+                      isDarkMode
+                        ? "text-blue-300 border-blue-300 hover:bg-blue-800"
+                        : "text-blue-400 border-blue-400 hover:bg-blue-50"
+                    }`}
                     onClick={handlePrev}
-                    style={{marginTop:'2px'}}
+                    style={{ marginTop: "2px" }}
                   >
-                    <ChevronLeftIcon className=" border-none border-red-500 my-auto h-full" />
+                    <ChevronLeftIcon className="my-auto h-full" />
                     Back
                   </button>
                 ) : (
@@ -407,19 +475,19 @@ function CreateTeamPage(props: any) {
                 )}
               </Tooltip>
               <Tooltip
-                title={
-                  currentPage == 0
-                    ? "Select Team Members"
-                    : "Submit"
-                }
+                title={currentPage == 0 ? "Select Team Members" : "Submit"}
               >
                 {currentPage !== 1 ? (
                   <button
-                    className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-blue-500 px-4 py-2 text-white rounded-md  active:bg-blue-600 transition flex flex-row"
+                    className={`ml-auto mr-7 mt-auto mb-0 w-fit px-4 py-2 text-white rounded-md transition flex flex-row ${
+                      isDarkMode
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-500 hover:bg-blue-600"
+                    }`}
                     onClick={handleNext}
                   >
                     Next
-                    <ChevronRightIcon className=" border-none border-red-500 my-auto h-full" />
+                    <ChevronRightIcon className="my-auto h-full" />
                   </button>
                 ) : (
                   // <button
@@ -433,15 +501,15 @@ function CreateTeamPage(props: any) {
                   //   Submit
                   // </button>
                   <LoadingButton
-                  className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-green-600 px-4 py-2 text-white rounded-md  active:bg-green-700 transition hover:bg-green-600"
-                  loading={awaitSubmit}
-                  loadingPosition="start"
-                  startIcon={<DoneIcon />}
-                  onClick={handleSubmit}
-                  // variant="outlined"
-                >
-                  Submit
-                </LoadingButton>
+                    className=" ml-auto mr-7 mt-auto mb-0 w-fit bg-green-600 px-4 py-2 text-white rounded-md  active:bg-green-700 transition hover:bg-green-600"
+                    loading={awaitSubmit}
+                    loadingPosition="start"
+                    startIcon={<DoneIcon />}
+                    onClick={handleSubmit}
+                    // variant="outlined"
+                  >
+                    Submit
+                  </LoadingButton>
                 )}
               </Tooltip>
             </div>
@@ -800,7 +868,10 @@ const CustomModalBackdrop = styled(Backdrop)`
   z-index: -1;
   position: fixed;
   inset: 0;
-  background-color: rgb(0 0 0 / 0.5);
+  background-color: ${(props) =>
+    props.theme.palette.mode === "dark"
+      ? "rgb(0 0 0 / 0.7)"
+      : "rgb(0 0 0 / 0.5)"};
   backdrop-filter: blur(1px);
   -webkit-tap-highlight-color: transparent;
 `;

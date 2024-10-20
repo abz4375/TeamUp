@@ -1,3 +1,4 @@
+/*
 // @desc Get Projects
 // @route GET /api/projects
 // @access Private
@@ -16,14 +17,14 @@ export const setProject = (req:any, res:any) => {
 // @route PUT /api/projects/:id
 // @access Private
 export const updateProject = (req:any, res:any) => {
-    res.status(200).json({ message: `Update goal ${req.params.id}` })
+    res.status(200).json({ message: `Update project ${req.params.id}` })
 }
 
 // @desc Delete Project
 // @route DELETE /api/goals/:id
 // @access Private
 export const deleteProject = (req:any, res:any) => {
-    res.status(200).json({ message: `Delete goal ${req.params.id}` })
+    res.status(200).json({ message: `Delete project ${req.params.id}` })
 }
 
 
@@ -33,3 +34,4 @@ module.exports = {
     updateProject,
     deleteProject
 }
+*/

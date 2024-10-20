@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
       // const contributions: any = queryParams.get('contributions') || null;
       const searchTerm: any = queryParams.get('t') || null;
       const searchTermRegex = new RegExp(searchTerm);
+
+      // const body = await request.json();
       // console.log('search term regex: ',searchTermRegex)
       // console.log('search term: ', searchTerm)
 
@@ -41,6 +43,7 @@ export async function GET(request: NextRequest) {
       // if (tasks) filter.tasks = tasks;
       // if (contributions) filter.contributions = contributions;
       if (searchTermRegex) filter.emailId = { $regex: searchTermRegex, $options: 'i' };
+      // if(body.emailId) filter.emailId = body.emailId;
 
       // console.log("query given: ", filter)
       const users = await User.find(filter).sort({ emailId: 1 }).limit(10); // Find users based on the filter

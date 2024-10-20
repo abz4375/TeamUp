@@ -81,44 +81,37 @@ const Project = (props: any) => {
     //   </Paper>
     // </Box>
     <Tooltip arrow placement="right" title={` Open`}>
-      <div className="cursor-pointer min-w-72 w-72 h-72 mx-3 my-4 border-gray-400 border-2 rounded-xl hover:mt-3 hover:mb-5 transition-all bg-gray-50 grid  select-none active:border-opacity-80 hover:shadow-lg hover:border-gray-700 hover:bg-gray-100" onClick={()=>{props.setProjectToggle(true); props.setProjectPageId(props.projectId)}}>
-        <div className=" flex my-2 mt-8 flex-col w-full p-2">
-          {/* <img src={logo.src} alt="logo" className=" w-10 h-10 mx-2 my-2" /> */}
-          <span className=" transition-all w-full text-center mx-auto my-2 text-3xl font-normal  select-text selection:bg-blue-200 selection:blur-md ">
+      <div 
+        className={`cursor-pointer min-w-72 w-72 h-72 mx-3 my-4 border-2 rounded-xl hover:mt-3 hover:mb-5 transition-all grid select-none active:border-opacity-80 hover:shadow-lg
+        ${props.isDarkMode 
+          ? 'bg-gray-800 border-gray-600 hover:border-gray-500 hover:bg-gray-700' 
+          : 'bg-gray-50 border-gray-400 hover:border-gray-700 hover:bg-gray-100'}`} 
+        onClick={() => {props.setProjectToggle(true); props.setProjectPageId(props.projectId)}}
+      >
+        <div className="flex my-2 mt-8 flex-col w-full p-2">
+          <span className={`transition-all w-full text-center mx-auto my-2 text-3xl font-normal select-text
+            ${props.isDarkMode ? 'text-gray-200 selection:bg-blue-800' : 'text-gray-800 selection:bg-blue-200'} 
+            selection:blur-md`}>
             {info?.title}
           </span>
           {info?.ownerEmailId === props.email ? (
             <span className="w-full text-center mx-auto mt-auto mb-0 text-xs font-light">
-              {/* <Tooltip title={"Manage"}>
-                <IconButton
-                  aria-label="Manage"
-                  className="bg-gray-100 border-2 border-gray-300"
-                >
-                  <TuneIcon />
-                </IconButton>
-              </Tooltip> */}
-              {/* <Tooltip title='Manage Settings'> */}
-                <Chip
-                  className="text-md mt-2 cursor-pointer font-normal "
-                  label={
-                    'Admin Panel'
-                  }
-                  avatar={<TuneIcon/>}
-                />
-              {/* </Tooltip> */}
+              <Chip
+                className={`text-md mt-2 cursor-pointer font-normal
+                  ${props.isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
+                label='Admin Panel'
+                avatar={<TuneIcon className={props.isDarkMode ? 'text-gray-300' : 'text-gray-600'} />}
+              />
             </span>
           ) : (
             <span className="w-full text-center mx-auto mt-auto mb-0 text-xs font-light">
-              Owned by <br />{" "}
-              {/* <Tooltip title={info?.ownerEmailId}> */}
-                <Chip
-                  className="text-md mt-2 cursor-pointer font-normal"
-                  label={
-                    info?.ownerEmailId === props.email ? "You" : info?.ownerName
-                  }
-                  avatar={<Avatar src={info?.ownerPic} />}
-                />
-              {/* </Tooltip> */}
+              Owned by <br />
+              <Chip
+                className={`text-md mt-2 cursor-pointer font-normal
+                  ${props.isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
+                label={info?.ownerEmailId === props.email ? "You" : info?.ownerName}
+                avatar={<Avatar src={info?.ownerPic} />}
+              />
             </span>
           )}
         </div>
@@ -166,79 +159,44 @@ const ProjectPane = (props: any) => {
   // };
   return (
     <div
-      className=" mt-2 ml-4 border-2 border-amber-200 rounded-2xl bg-amber-50 bg-opacity-55 flex flex-row h-80 overflow-y-hidden"
-      style={{ width: "99.2%", height: "20rem" }}
+      className={`mt-2 ml-4 rounded-2xl flex flex-col h-full overflow-hidden
+        ${props.isDarkMode 
+          ? 'bg-gray-900 bg-opacity-90' 
+          : 'bg-amber-50 bg-opacity-55'}`}
+      style={{ width: "93vw" }}
     >
-      {/* <center>
-        <code>Project-Pane</code>
-      </center> */}
       <div
-        className="w-full flex h-fit overflow-auto"
+        className="w-full flex-1 overflow-x-auto overflow-y-hidden"
         style={{ scrollBehavior: "smooth", scrollbarColor: "transparent" }}
-        // responsive={responsive}
-        // swipeable={false}
-        // draggable={false}
-        // ssr={true}
-        // customTransition="all .5"
-        // transitionDuration={500}
-        // containerClass="carousel-container"
-        // itemClass="carousel-item-padding-40-px"
-        // keyBoardControl={true}
       >
-        {/* <Carousel
-  swipeable={false}
-  draggable={false}
-  showDots={true}
-  responsive={responsive}
-  ssr={true} // means to render carousel on server-side.
-  infinite={true}
-  autoPlay={this.props.deviceType !== "mobile" ? true : false}
-  autoPlaySpeed={1000}
-  keyBoardControl={true}
-  customTransition="all .5"
-  transitionDuration={500}
-  containerClass="carousel-container"
-  removeArrowOnDeviceType={["tablet", "mobile"]}
-  deviceType={this.props.deviceType}
-  dotListClass="custom-dot-list-style"
-  itemClass="carousel-item-padding-40-px"
-  > */}
-        {/* <div>Project 1</div> */}
-        {/* <div>Project 2</div> */}
-        {/* <div>Project 3</div> */}
-        {/* <div>Project 4</div> */}
-        {props.projects &&
-          props.projects.map((projectId: any, index: any) => (
-            <Project
-              projectId={projectId}
-              id={index}
-              key={projectId}
-              {...props}
-            />
-          ))}
-        {!props.projects || !props.projects.length ? (
-          <>
-            <div className="w-7/8 h-80 m-auto rounded-lg grid">
-              <div className=" grid m-auto my-2 mt-8">
-                <span className=" m-auto text-3xl font-light text-amber-900 font-mono">
+        <div className="flex h-full">
+          {props.projects &&
+            props.projects.map((projectId: any, index: any) => (
+              <Project
+                projectId={projectId}
+                id={index}
+                key={projectId}
+                isDarkMode={props.isDarkMode}
+                {...props}
+              />
+            ))}
+          {!props.projects || !props.projects.length ? (
+            <div className={`w-full h-full flex items-center justify-center
+              ${props.isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+              <div className="text-center">
+                <span className={`text-3xl font-light font-mono
+                  ${props.isDarkMode ? 'text-amber-300' : 'text-amber-900'}`}>
                   &lt;\&gt; No Teams
                   <br />
                   <br />
-                  <span className="text-4xl font-semibold"> Form a Team!</span>
+                  <span className="text-4xl font-semibold">Form a Team!</span>
                 </span>
-                <hr className=" border-none w-4/5 border-2 mx-auto border-b-0 " />
+                <hr className={`border-none w-4/5 border-2 mx-auto border-b-0 mt-4
+                  ${props.isDarkMode ? 'border-amber-300' : 'border-amber-900'}`} />
               </div>
             </div>
-          </>
-        ) : (
-          <></>
-        )}
-        {/* <Project projectId="1" />
-        <Project projectId="2" />
-        <Project projectId="3" />
-        <Project projectId="4" />
-        <Project projectId="5" />
-        <Project projectId="6" /> */}
+          ) : null}
+        </div>
       </div>
     </div>
   );
