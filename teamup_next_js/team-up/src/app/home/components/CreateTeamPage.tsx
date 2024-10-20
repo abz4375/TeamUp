@@ -334,7 +334,16 @@ function CreateTeamPage(props: any) {
                     id="fixed-tags-demo"
                     value={value}
                     onChange={(event, newValue) => {
-                      // ... existing onChange logic
+                      setValue([
+                        {
+                          name: props.userDetail.name,
+                          emailId: props.userDetail.emailId,
+                          profilePic: props.userDetail.profilePic,
+                        },
+                        ...newValue.filter(
+                          (option) => option.emailId !== props.userDetail.emailId
+                        ),
+                      ]);
                     }}
                     options={users}
                     getOptionLabel={(option) => option.emailId ?? ""}
