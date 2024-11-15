@@ -4,80 +4,17 @@ import clsx from "clsx";
 import { styled, css } from "@mui/system";
 import { Portal } from "@mui/base/Portal";
 import { FocusTrap } from "@mui/base/FocusTrap";
-import { Button } from "@mui/base/Button";
 import { unstable_useModal as useModal } from "@mui/base/unstable_useModal";
 import Fade from "@mui/material/Fade";
-// import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-// import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-// import DoneIcon from "@mui/icons-material/Done";
 import InfoIcon from "@mui/icons-material/Info";
-// import logo from "../../assets/logo.png";
-// import WysiwygIcon from "@mui/icons-material/Wysiwyg";
-import { Avatar, Tooltip } from "@mui/material";
 
-import Chip from "@mui/material/Chip";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import AddTaskIcon from "@mui/icons-material/AddTask";
-import PublishIcon from "@mui/icons-material/Publish";
-import { Theme } from "@emotion/react";
-
-// import LoadingButton from "@mui/lab/LoadingButton";
-
-const Contributor = (props: any) => {
-  const [fetchAgain, setFetchAgain] = React.useState(true);
-  const [contributorInfo, setContributorInfo] = React.useState({
-    name: "",
-    profilePic: "",
-  });
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      // console.log('fetch again:',fetchAgain,'projectid:',props.projectPageId)
-      if (fetchAgain && props.contributorEmailId) {
-        // setTimeout(async() => {
-        const response = await fetch(
-          "http://localhost:3000/api/user-search?t=" + props.contributorEmailId
-        );
-        if (response.ok) {
-          const responseJson = await response.json();
-
-          if (await responseJson[0]) {
-            // router.push('/log-in')
-            setContributorInfo(await responseJson[0]);
-            setFetchAgain(false);
-            // console.log(responseJson);
-          }
-        } else if (response.status === 404) {
-          console.error("Fetch failed:", response.statusText);
-          // return;
-          setFetchAgain(false);
-        } else {
-          setFetchAgain(true);
-        }
-        // }, 1000);
-      }
-    };
-
-    fetchData();
-  }, []);
-  // console.log(contributorInfo)
-
-  return (
-    <Tooltip title={props.contributorEmailId}>
-      <div className=" p-2 text-lg font-light bg-white border-2 border-gray-200 mx-1 mt-1 shadow-sm flex flex-row hover:shadow-md transition-all hover:border-gray-300 hover:cursor-pointer">
-        <Avatar src={contributorInfo.profilePic} className="my-auto mr-2" />
-        <span className="my-auto overflow-x-hidden">
-          {contributorInfo.name}
-        </span>
-      </div>
-    </Tooltip>
-  );
-};
+import CreateTask from "./ManageProject/CreateTask";
+import Contributor from "./ManageProject/Contributor";
 
 interface Props {
   userDetail: {
@@ -93,20 +30,18 @@ interface Props {
   isDarkMode: boolean; // Add this line
 }
 
-
 function ManageProject(props: Props) {
   const [userSearchTerm, setUserSearchTerm] = React.useState("");
   const [users, setUsers] = React.useState<any>([{ empty: true }]);
   const [emptyList, setEmptyList] = React.useState("");
   const [fetchAgain, setFetchAgain] = React.useState(props.projectToggle);
-  const [projectTitle, setProjectTitle] = React.useState("");
-  const [awaitSubmit, setAwaitSubmit] = React.useState(false);
+  const isDarkMode = props.isDarkMode;
 
   const [info, setInfo] = React.useState({
     title: "",
     description: "",
     owner: "",
-    maintainers: [''],
+    maintainers: [""],
     contributors: [],
     tasks: [],
     contributions: [],
@@ -116,9 +51,7 @@ function ManageProject(props: Props) {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      // console.log('fetch again:',fetchAgain,'projectid:',props.projectPageId)
       if (fetchAgain && props.projectPageId) {
-        // setTimeout(async() => {
         const response = await fetch(
           "http://localhost:3000/api/project?id=" + props.projectPageId
         );
@@ -126,92 +59,29 @@ function ManageProject(props: Props) {
           const responseJson = await response.json();
 
           if (await responseJson[0]) {
-            // router.push('/log-in')
             setInfo(await responseJson[0]);
             setFetchAgain(false);
-            // console.log(responseJson);
           }
         } else if (response.status === 404) {
           console.error("Fetch failed:", response.statusText);
-          // return;
           setFetchAgain(false);
         } else {
           setFetchAgain(true);
         }
-        // }, 1000);
       }
     };
 
     fetchData();
   }, []);
 
-
   const [open, setOpen] = React.useState(props.toggle || false);
   const [currentPage, setCurrentPage] = React.useState("tasks");
   const [createTask, setCreateTask] = React.useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     props.setProjectToggle(false);
   };
-  //   const handleNext = () => {
-  //     setCurrentPage((currentPage + 1) % 2);
-  //     // console.log("currpage is: ", currentPage);
-  //   };
 
-  // const handlePrev = () => {
-  //   setCurrentPage(currentPage - 1);
-  //   // console.log("currpage is: ", currentPage);
-  // };
-
-  const handleSubmit = async () => {
-    setAwaitSubmit(true);
-    const contributors = Array.from(new Set(value.map((user) => user.emailId)));
-    const data = {
-      title: projectTitle,
-      description: projDescMarkdown,
-      owner: props.userDetail.emailId,
-      maintainers: [props.userDetail.emailId],
-      contributors: contributors,
-      tasks: [],
-      contributions: [],
-    };
-    if ((!data.title || data.title === "") && data.contributors.length === 1) {
-      setAwaitSubmit(false);
-      return;
-    }
-    const url = "http://localhost:3000/api/create-project";
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      //   console.log(response);
-
-      if (response.status === 201) {
-        // const responseJson = await response.json();
-        // console.log("Signup successful:", responseJson);
-        // Handle successful signup (e.g., redirect to login page)
-        setAwaitSubmit(false);
-        props.setRefreshHomePage(true);
-        handleClose();
-      } else {
-        console.error("Project Creation failed:", response.statusText);
-        setAwaitSubmit(false);
-        // Handle signup errors (e.g., display error message)
-      }
-    } catch (error) {
-      setAwaitSubmit(false);
-      console.error("Error creating Project:", error);
-      // Handle network or other errors
-    }
-  };
-
-  // const fixedOptions = [top100Films[6]];
-  const fixedOptionsTemp: any = [];
-  // const [value, setValue] = React.useState([...fixedOptions, top100Films[13]]);
-  // const [value, setValue] = React.useState([...fixedOptions]);
   const [value, setValue] = React.useState([
     {
       name: props.userDetail.name,
@@ -219,21 +89,56 @@ function ManageProject(props: Props) {
       profilePic: props.userDetail.profilePic,
     },
   ]);
-  // const [value, setValue] = React.useState([...fixedOptionsTemp, {
-  //   name: props.userDetail.name,
-  //   emailId: props.userDetail.emailId,
-  //   profilePic: props.userDetail.profilePic
-  // }]);
 
-  const [projDescMarkdown, setProjDescMarkdown] = React.useState(
-    "* [ ] Write Description in 📝 `Markdown`!"
-  );
+  const handleCreateTask = async (taskData: any) => {
+    console.log("Creating task:", taskData);
 
+    // Create a FormData object to send files and other task data
+    const formData = new FormData();
 
-  const [toShowMarkdownPreview, setToShowMarkdownPreview] =
-    React.useState(false);
+    // Append task data to formData
+    Object.keys(taskData).forEach((key) => {
+      if (key !== "files") {
+        formData.append(key, taskData[key]);
+      }
+    });
 
-  const placeholderDesc = `Write Description in Markdown !`;
+    // Append files to formData
+    if (taskData.files && taskData.files.length > 0) {
+      taskData.files.forEach((file: File, index: number) => {
+        formData.append(`file-${index}`, file);
+      });
+    }
+
+    try {
+      // Send a POST request to your server to create the task and upload files
+      const response = await fetch("/api/task", {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+      const responseText = await response.text();
+      console.log("Response text:", responseText);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Task created successfully:", result);
+
+        // Update the local state or trigger a refresh
+        setFetchAgain(true);
+
+        // Close the create task modal
+        setCreateTask(false);
+      } else {
+        console.error("Failed to create task:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error creating task:", error);
+    }
+  };
+
   return (
     <div className={props.isDarkMode ? "dark" : ""}>
       <Modal
@@ -244,13 +149,14 @@ function ManageProject(props: Props) {
         closeAfterTransition
       >
         <Fade in={open}>
-        <ModalContent
+          <ModalContent
             sx={style}
             className={`w-4/5 h-4/5 overflow-auto overflow-x-hidden ${
-              props.isDarkMode ? "bg-dark-bg text-dark-text" : "bg-white text-black"
+              props.isDarkMode
+                ? "bg-dark-bg text-dark-text"
+                : "bg-white text-black"
             }`}
-            isDarkMode = {props.isDarkMode}
-            // theme = {"dark"}
+            isDarkMode={props.isDarkMode}
           >
             <div
               id="transition-modal-title"
@@ -261,8 +167,12 @@ function ManageProject(props: Props) {
               <span className="my-auto font-semibold">{info?.title}</span>
               <button
                 className={
-                  " ml-4 text-lg w-fit h-full p-1 border-2 rounded-md flex flex-row my-auto hover:border-blue-500 hover:bg-blue-50 transition-all" +
-                  (currentPage === "info" ? " bg-blue-50 border-blue-500" : "")
+                  " ml-4 text-lg w-fit h-full p-1 border-2 rounded-md flex flex-row my-auto hover:border-blue-500 transition-all" +
+                  (currentPage === "info" && !props.isDarkMode
+                    ? " bg-blue-50 border-blue-500"
+                    : "bg-blue-900 border-blue-500") +
+                  "hover:" +
+                  (props.isDarkMode ? "bg-blue-900" : "bg-blue-50")
                 }
                 onClick={() => {
                   if (currentPage !== "info") setCurrentPage("info");
@@ -277,7 +187,9 @@ function ManageProject(props: Props) {
               className={
                 currentPage === "info"
                   ? `border-none w-full mx-auto mt-0 overflow-auto modal-content h-full rounded-lg p-1 ${
-                      props.isDarkMode ? "bg-dark-bg-secondary" : "bg-gray-200 bg-opacity-30"
+                      props.isDarkMode
+                        ? "bg-dark-bg-secondary"
+                        : "bg-gray-200 bg-opacity-30"
                     } min-h-96`
                   : `border-t-2 border-gray-500 w-full mt-0 overflow-hidden modal-content h-0 p-0`
               }
@@ -288,12 +200,14 @@ function ManageProject(props: Props) {
                   (currentPage === "info" ? "" : " hidden")
                 }
               >
-                <div className=" w-2/3 border-2 border-blue-500 border-opacity-10 rounded-md m-1  bg-white p-4 text-lg flex flex-col overflow-auto">
+                <div
+                  className={` w-2/3 border-2 border-blue-500 border-opacity-10 rounded-md m-1  p-4 text-lg flex flex-col overflow-auto border-none ${
+                    props.isDarkMode
+                      ? "text-dark-text bg-dark-bg-secondary bg-opacity-100"
+                      : "text-black"
+                  }`}
+                >
                   <Markdown
-                    // className={' pt-2' + (toShowMarkdownPreview)?'':' hidden'}
-                    className={`text-lg border-none ${
-                      props.isDarkMode ? "text-dark-text" : "text-black"
-                    }`}
                     remarkPlugins={[remarkGfm]}
                     children={info?.description}
                     components={{
@@ -313,8 +227,9 @@ function ManageProject(props: Props) {
                           <div
                             {...rest}
                             className={
-                              className +
-                              " bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
+                              isDarkMode
+                                ? "bg-gray-700 rounded-md px-1 font-mono w-fit inline-block"
+                                : "bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
                             }
                             ref={null}
                           >
@@ -325,15 +240,29 @@ function ManageProject(props: Props) {
                     }}
                   />
                 </div>
-                <div className={`w-1/3 border-2 rounded-md m-1 flex flex-col overflow-hidden border-opacity-15 ${
-              props.isDarkMode ? "bg-dark-bg-secondary border-dark-border" : "bg-gray-50 border-gray-600"
-            }`}>
-                  <span className="mt-0 w-full px-4 py-2 font-light text-xl h-fit text-center bg-gray-200 border-b-2 border-gray-400">
+                <div
+                  className={`w-1/3 border-2 rounded-md m-1 flex flex-col overflow-hidden ${
+                    props.isDarkMode
+                      ? "bg-dark-bg-secondary border-white border-opacity-25"
+                      : "bg-gray-50 border-gray-600 border-opacity-15"
+                  }`}
+                >
+                  <span
+                    className={`mt-0 w-full px-4 py-2 font-light text-xl h-fit text-center border-b-2  ${
+                      props.isDarkMode
+                        ? "bg-dark-bg-secondary border-white border-opacity-25"
+                        : "bg-gray-200 border-gray-400"
+                    }`}
+                  >
                     Contributors
                   </span>
                   <div className="flex flex-col overflow-auto">
                     {info?.contributors.map((contributorEmailId) => (
-                      <Contributor contributorEmailId={contributorEmailId} />
+                      <Contributor
+                        key={contributorEmailId}
+                        contributorEmailId={contributorEmailId}
+                        isDarkMode={props.isDarkMode}
+                      />
                     ))}
                   </div>
                 </div>
@@ -345,28 +274,43 @@ function ManageProject(props: Props) {
                 id="transition-modal-title"
                 className="modal-title text-left text-2xl font-extralight transition h-fit border-none border-red-500 pt-4 flex flex-row pl-0"
               >
-                <span className="my-auto font-sans text-blue-900 ml-4 w-fit bg-blue-100 px-5 py-2 rounded-md font-normal border-b-2 border-blue-900">
+                <span
+                  className={`my-auto font-sans ml-4 w-fit px-5 py-2 rounded-md font-normal border-b-2 ${
+                    props.isDarkMode
+                      ? "text-blue-300 bg-blue-900 border-blue-300"
+                      : "text-blue-900 bg-blue-100 border-blue-900"
+                  }`}
+                >
                   {" "}
                   🎯&nbsp; Manage Tasks
                 </span>
+
                 <div
                   className={
-                    "flex flex-row h-fit w-fit ml-auto mr-4 mt-0 mb-1 border-none bg-gray-50 p-2 rounded-lg pl-0 pr-4 shadow-sm" +
+                    "flex flex-row h-fit w-fit ml-auto mr-4 mt-0 mb-1 border-none bg-gray-0 p-2 rounded-lg pl-0 pr-4 shadow-sm" +
                     (info.maintainers.indexOf(props.userDetail.emailId) === -1
                       ? " hidden"
                       : "")
                   }
                 >
                   <button
-                    className=" hover:bg-blue-500 ml-4 mr-2 w-fit h-fit bg-blue-400 px-2 py-2 text-white rounded-full  active:bg-blue-600 transition flex flex-row my-auto"
+                    className={`hover:bg-blue-500 ml-4 mr-2 w-fit h-fit px-2 py-2 rounded-full transition flex flex-row my-auto ${
+                      props.isDarkMode
+                        ? "bg-blue-700 text-blue-100 active:bg-blue-800"
+                        : "bg-blue-400 text-white active:bg-blue-600"
+                    }`}
                     onClick={() => {
                       if (!createTask) setCreateTask(true);
                       else setCreateTask(false);
                     }}
                   >
-                    <AddTaskIcon className=" w-5 h-5" />
+                    <AddTaskIcon className="w-5 h-5" />
                   </button>
-                  <div className=" border-none h-fit  my-auto text-lg font-normal text-blue-500 font-sans">
+                  <div
+                    className={`border-none h-fit my-auto text-lg font-normal font-sans ${
+                      props.isDarkMode ? "text-blue-300" : "text-blue-500"
+                    }`}
+                  >
                     Create Task
                   </div>
                 </div>
@@ -375,157 +319,24 @@ function ManageProject(props: Props) {
                 <div
                   className={
                     createTask
-                      ? " w-full mx-auto mt-2 overflow-auto modal-content rounded-lg p-1 bg-gray-100 "
+                      ? " w-full mx-auto mt-2 overflow-auto modal-content rounded-lg p-1  "
                       : " w-full mt-2 overflow-hidden modal-content h-0 p-0"
                   }
-                  //   style={{height:'75vh'}}
                 >
-                  <div
-                    className={
-                      "w-full h-fit flex flex-row shadow-sm" +
-                      (createTask ? "" : " hidden")
-                    }
-                  >
-                    <div className=" w-2/3 m-1">
-                      <textarea
-                        className=" w-full border-2 border-blue-900 border-opacity-10 rounded-md  bg-white p-4 text-2xl flex flex-col overflow-auto resize-none h-60"
-                        placeholder="Task Description..."
-                      >
-                        
-                      </textarea>
-                      <form
-                        action={() => {}}
-                        className=" mx-auto grid w-full h-20 mt-3"
-                      >
-                        <div className="mx-auto flex flex-row text-lg w-full h-full border-none rounded-md bg-white">
-                          <Autocomplete
-                            className=" ml-2 mr-auto my-auto"
-                            sx={{width:'80vw'}}
-                            multiple
-                            id="fixed-tags-demo"
-                            value={value}
-                            onChange={(event, newValue) => {
-                              setValue([
-                                {
-                                  name: props.userDetail.name,
-                                  emailId: props.userDetail.emailId,
-                                  profilePic: props.userDetail.profilePic,
-                                },
-                                ...newValue.filter(
-                                  (option) =>
-                                    option.emailId !== props.userDetail.emailId
-                                  // (option) => value.filter((member)=>member.emailId !== option.emailId)
-                                ),
-                              ]);
-                              setUserSearchTerm(userSearchTerm);
-                            }}
-                            // options={top100Films}
-                            options={users}
-                            // getOptionLabel={(option) => option.year}
-                            getOptionLabel={(option) => {
-                              // return "<div>"+option.title+"<br/>"+option.year+"</div>"
-                              // return option.title + ` ( ` + option.year + ` )`
-                              return option.emailId ?? "";
-                            }}
-                            renderOption={(props, option) =>
-                              option.emailId ? (
-                                <li
-                                  {...props}
-                                  className=" hover:bg-gray-100 m-2 p-1 rounded-lg transition flex flex-row cursor-pointer"
-                                >
-                                  <Avatar
-                                    src={option.profilePic ?? ""}
-                                    className="mr-3"
-                                  />
-                                  <div className=" flex flex-col">
-                                    <span>{option.name ?? ""}</span>
-                                    <span
-                                      style={{ fontSize: "smaller" }}
-                                      className=" text-gray-500"
-                                    >
-                                      {option.emailId ?? ""}
-                                    </span>
-                                  </div>
-                                </li>
-                              ) : (
-                                <div className="text-center text-gray-400">
-                                  search...
-                                </div>
-                              )
-                            }
-                            renderTags={(tagValue, getTagProps) =>
-                              tagValue.map((option, index) => (
-                                <Tooltip title={option.emailId}>
-                                  <Chip
-                                    label={option.name}
-                                    avatar={<Avatar src={option.profilePic} />}
-                                    {...getTagProps({ index })}
-                                    disabled={
-                                      option.emailId ===
-                                      props.userDetail.emailId
-                                    }
-                                    className="m-1 transition-all"
-                                    // disabled={fixedOptionsTemp.indexOf(option) !== -1}
-                                  />
-                                </Tooltip>
-                              ))
-                            }
-                            style={{ width: 600 }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Assign To"
-                                placeholder={
-                                  value.length === 1 ? "Search by e-mail" : ""
-                                }
-                                onChange={(e) => {
-                                  setUserSearchTerm(e.target.value);
-                                  setFetchAgain(true);
-                                }}
-                                value={userSearchTerm}
-                                // onChange={(e)=>set}
-                              />
-                            )}
-                            noOptionsText={emptyList}
-                          />
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className=" flex flex-col w-1/3">
-                      <div className=" border-2 border-gray-600 rounded-md m-1 bg-white flex flex-col overflow-hidden border-opacity-15 h-60">
-                        <span className="mt-0 w-full px-4 py-2 font-light text-xl h-fit text-center bg-white border-b-2 border-gray-400">
-                          📎 - Add Documents
-                        </span>
-                        <div className="flex flex-col overflow-auto py-2 ">
-                          <div className="flex flex-row h-fit w-full overflow-hidden ml-0 mr-auto mt-0 border-none bg-gray-50 p-1 rounded-lg pl-0 pr-4">
-                            <button
-                              className=" hover:bg-gray-500 ml-auto mr-2 bg-gray-400 text-white rounded-full  active:bg-gray-600 transition flex flex-row my-auto p-1"
-                            >
-                              <PublishIcon className="w-6 h-6 mx-auto my-auto" />
-                              <input
-                                type="file"
-                                className=" opacity-0 absolute cursor-pointer"
-                                onChange={(event) => {
-                                  const selectedFile = event.target.files
-                                    ? event.target.files[0]
-                                    : null;
-                                    
-                                  console.log(selectedFile?.name);
-                                }}
-                              ></input>
-                            </button>
-                            <div className=" border-none h-fit  my-auto text-lg font-normal font-sans ml-0 mr-auto">
-                              Upload
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <button className="h-20 m-2 border-green-500 border-2 rounded-lg bg-green-100  text-lg font-semibold active:bg-green-200 transition-all">
-                        💾 Save
-                      </button>
-                    </div>
-                  </div>
+                  {createTask && (
+                    <CreateTask
+                      isDarkMode={isDarkMode}
+                      userDetail={props.userDetail}
+                      users={users}
+                      emptyList={emptyList}
+                      userSearchTerm={userSearchTerm}
+                      setUserSearchTerm={setUserSearchTerm}
+                      setFetchAgain={setFetchAgain}
+                      value={value}
+                      setValue={setValue}
+                      // onCreateTask={handleCreateTask}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -616,7 +427,6 @@ const Modal = React.forwardRef(function Modal(
     childProps.tabIndex = "-1";
   }
 
-  // It's a Transition like component
   if (hasTransition) {
     const { onEnter, onExited } = getTransitionProps();
     childProps.onEnter = onEnter;
@@ -640,9 +450,10 @@ const Modal = React.forwardRef(function Modal(
 
   return (
     <Portal ref={portalRef} container={container} disablePortal={disablePortal}>
-      
       <CustomModalRoot {...rootProps}>
-        {!hideBackdrop ? <CustomModalBackdrop isDarkMode={true} {...backdropProps} /> : null}
+        {!hideBackdrop ? (
+          <CustomModalBackdrop isDarkMode={true} {...backdropProps} />
+        ) : null}
         <FocusTrap
           disableEnforceFocus={disableEnforceFocus}
           disableAutoFocus={disableAutoFocus}
@@ -711,13 +522,30 @@ const ModalContent = styled("div")<ModalContentProps>(
     flex-direction: column;
     gap: 8px;
     overflow: hidden;
-    background-color: ${isDarkMode ? theme.palette.mode === "dark" ? grey[900] : grey[800] : "#fff"};
+    background-color: ${isDarkMode
+      ? theme.palette.mode === "dark"
+        ? grey[900]
+        : grey[800]
+      : "#fff"};
     border-radius: 8px;
-    border: 1px solid ${isDarkMode ? theme.palette.mode === "dark" ? grey[700] : grey[600] : grey[200]};
+    border: 1px solid
+      ${isDarkMode
+        ? theme.palette.mode === "dark"
+          ? grey[700]
+          : grey[600]
+        : grey[200]};
     box-shadow: 0 4px 12px
-      ${isDarkMode ? "rgb(0 0 0 / 0.7)" : theme.palette.mode === "dark" ? "rgb(0 0 0 / 0.5)" : "rgb(0 0 0 / 0.2)"};
+      ${isDarkMode
+        ? "rgb(0 0 0 / 0.7)"
+        : theme.palette.mode === "dark"
+        ? "rgb(0 0 0 / 0.5)"
+        : "rgb(0 0 0 / 0.2)"};
     padding: 24px;
-    color: ${isDarkMode ? theme.palette.mode === "dark" ? grey[50] : grey[100] : grey[900]};
+    color: ${isDarkMode
+      ? theme.palette.mode === "dark"
+        ? grey[50]
+        : grey[100]
+      : grey[900]};
 
     & .modal-title {
       margin: 0;
@@ -754,43 +582,12 @@ interface CustomModalBackdropProps {
 
 const CustomModalBackdrop = styled(Backdrop)<ModalContentProps>(
   ({ theme, isDarkMode }) => css`
-  z-index: -1;
-  position: fixed;
-  inset: 0;
-  background-color: ${isDarkMode ? "rgb(0 0 0 / 0.7)" : "rgb(0 0 0 / 0.5)"};
-  backdrop-filter: blur(1px);
-  -webkit-tap-highlight-color: transparent;
-`);
-
-const TriggerButton = styled(Button)(
-  ({ theme }) => css`
-    font-family: "IBM Plex Sans", sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 150ms ease;
-    cursor: pointer;
-    background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
-    color: ${theme.palette.mode === "dark" ? grey[200] : grey[900]};
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-
-    &:hover {
-      background: ${theme.palette.mode === "dark" ? grey[800] : grey[50]};
-      border-color: ${theme.palette.mode === "dark" ? grey[600] : grey[300]};
-    }
-
-    &:active {
-      background: ${theme.palette.mode === "dark" ? grey[700] : grey[100]};
-    }
-
-    &:focus-visible {
-      box-shadow: 0 0 0 4px
-        ${theme.palette.mode === "dark" ? blue[300] : blue[200]};
-      outline: none;
-    }
+    z-index: -1;
+    position: fixed;
+    inset: 0;
+    background-color: ${isDarkMode ? "rgb(0 0 0 / 0.7)" : "rgb(0 0 0 / 0.5)"};
+    backdrop-filter: blur(1px);
+    -webkit-tap-highlight-color: transparent;
   `
 );
 

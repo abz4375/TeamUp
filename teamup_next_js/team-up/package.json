@@ -17,8 +17,10 @@
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.15.17",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@next/swc-linux-x64-gnu": "^15.0.3",
     "@prisma/client": "^5.13.0",
     "bcrypt": "^5.1.1",
+    "formidable": "^3.5.2",
     "mongoose": "^8.3.4",
     "next": "14.2.15",
     "next-auth": "^5.0.0-beta.18",
@@ -34,6 +36,7 @@
     "team-up": "file:"
   },
   "devDependencies": {
+    "@types/formidable": "^3.4.5",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
     "@types/react": "^18",
