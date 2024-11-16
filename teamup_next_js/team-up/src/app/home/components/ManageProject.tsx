@@ -139,6 +139,12 @@ function ManageProject(props: Props) {
     }
   };
 
+  const handleTaskCreated = () => {
+    setCreateTask(false); // Close the create task modal
+    // Optionally refresh the task list
+    // fetchTasks(); // You'll need to implement this
+  };
+
   return (
     <div className={props.isDarkMode ? "dark" : ""}>
       <Modal
@@ -334,6 +340,10 @@ function ManageProject(props: Props) {
                       setFetchAgain={setFetchAgain}
                       value={value}
                       setValue={setValue}
+                      onTaskCreated={handleTaskCreated} 
+                      fetchAgain={fetchAgain}
+                      setEmptyList={setEmptyList}
+                      setUsers={setUsers}
                       // onCreateTask={handleCreateTask}
                     />
                   )}
