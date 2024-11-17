@@ -447,7 +447,7 @@ function CreateTeamPage(props: any) {
                 <div className=" transition-all border-2 border-gray-200 rounded-full w-fit mx-auto mb-16 mt-auto h-fit hover:border-gray-300">
                   {value.map((member, index) => {
                     return (
-                      <Tooltip title={member.emailId}>
+                      <Tooltip title={member.emailId} key={index}>
                         <Chip
                           label={member.name}
                           avatar={<Avatar src={member.profilePic} />}
@@ -799,6 +799,7 @@ const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean }>(
     );
   }
 );
+Backdrop.displayName = 'Backdrop';  // Add this line to fix the warning
 
 const blue = {
   200: "#99CCFF",

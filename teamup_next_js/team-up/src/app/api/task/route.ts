@@ -3,41 +3,61 @@ import { join } from 'path';
 import { mkdir } from 'fs/promises';
 import { Task } from '../../../../models/taskModel';
 import { User } from '../../../../models/userModel';
+import { Project } from '../../../../models/projectModel';
 import formidable, { Fields, Files } from 'formidable';
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 
-export async function POST(req: NextRequest) {
+// Define uploadDir constant
+const uploadDir = join(process.cwd(), 'public', 'uploads');
+
+export async function POST(request: NextRequest) {
   try {
-    // Prepare uploads directory
-    const uploadDir = join(process.cwd(), 'public/uploads');
-    await mkdir(uploadDir, { recursive: true });
-
-    // Parse form data
-    const { fields, fileUrl } = await parseForm(req, uploadDir);
-
+    const { fields, fileUrl } = await parseForm(request, uploadDir);
+    
     // Extract task details
     const description = Array.isArray(fields.description) 
-    ? fields.description[0]  // Take first element if it's an array
-    : fields.description || '';
-    let assigneeEmails: string[] = [];
+      ? fields.description[0] 
+      : fields.description || '';
 
-    if (fields.assignees) {
-      // Check if assignees is already an array
-      assigneeEmails = Array.isArray(fields.assignees) ? fields.assignees : JSON.parse(fields.assignees);
-    }
+    // Parse assignee emails from form data
+    const assigneeEmails = fields.assignees 
+      ? JSON.parse(Array.isArray(fields.assignees) ? fields.assignees[0] : fields.assignees) 
+      : [];
 
-    // Convert assignee emails to ObjectIds
-    const assignees = await User.find({ email: { $in: assigneeEmails } }).select('_id');
-    const assigneeIds = assignees.map(user => user._id);
+    // Get project name from form data
+    const projectName = Array.isArray(fields.projectName)
+      ? fields.projectName[0]
+      : fields.projectName || '';
+      // console.log(projectName);
+    
+      const projectId = Array.isArray(fields.projectId)
+      ? fields.projectId[0]
+      : fields.projectId || '';
 
-    // Save task in the database
+    // Create task in database
     const task = await Task.create({
       description,
-      assignees: assigneeIds,
+      assignees: assigneeEmails,
       fileUrl,
+      projectName, // Add project name
+      projectId, //
       createdAt: new Date(),
     });
+
+    // Update each assignee's user document
+    for (const email of assigneeEmails) {
+      await User.findOneAndUpdate(
+        { emailId: email },
+        { $push: { tasks: task._id } }
+      );
+    }
+
+    // Update project document
+    await Project.findByIdAndUpdate(
+      projectId,
+      { $push: { tasks: task._id } }
+    );
 
     return NextResponse.json({
       success: true,
@@ -45,11 +65,13 @@ export async function POST(req: NextRequest) {
       task: {
         id: task._id,
         description,
-        assignees: assigneeIds,
+        assignees: assigneeEmails,
         fileUrl,
+        projectName, // Include in response
+        projectId, //
+        createdAt: task.createdAt
       },
     });
-
   } catch (error) {
     console.error('Error creating task:', error);
     return NextResponse.json(
@@ -124,6 +146,73 @@ async function parseForm(req: NextRequest, uploadDir: string): Promise<{ fields:
       resolve({ fields, fileUrl });
     });
   });
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const taskId = request.nextUrl.searchParams.get('id');
+    const projectId = request.nextUrl.searchParams.get('projectId');
+    
+    if (!taskId && !projectId) {
+      return NextResponse.json(
+        { success: false, message: 'Task ID is required' },
+        { status: 400 }
+      );
+    }
+
+    if (projectId) {
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return NextResponse.json(
+          { success: false, message: 'Project not found' },
+          { status: 404 }
+        );
+      }
+      
+      // Fetch all tasks for the project
+      const tasks = await Task.find({ projectId: projectId });
+      
+      return NextResponse.json({
+        success: true,
+        tasks: tasks.map(task => ({
+          id: task._id,
+          description: task.description,
+          assignees: task.assignees,
+          fileUrl: task.fileUrl,
+          projectName: task.projectName,
+          createdAt: task.createdAt
+        }))
+      });
+    }
+
+    const task = await Task.findById(taskId);
+    
+    if (!task) {
+      return NextResponse.json(
+        { success: false, message: 'Task not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      task: {
+        id: task._id,
+        description: task.description,
+        assignees: task.assignees,
+        fileUrl: task.fileUrl,
+        projectName: task.projectName, // Include project name in response
+        createdAt: task.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching task:', error);
+    return NextResponse.json(
+      { success: false, message: 'Error fetching task' },
+      { status: 500 }
+    );
+  }
 }
 
 export const runtime = 'nodejs' // optional

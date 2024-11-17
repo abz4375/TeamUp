@@ -4,60 +4,91 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 
 interface TaskProps {
-  desc: string;
+  fetchID: string;
   isDarkMode: boolean;
 }
 
-export default function Task({ desc, isDarkMode }: TaskProps) {
-  const [loading, setLoading] = React.useState(false);
+interface TaskDetails {
+  description: string;
+  fileUrl?: string;
+  projectName: string;
+  createdAt: string;
+}
 
-  function handleClick() {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false)
-    }, 3000);
+export default function Task({ fetchID, isDarkMode }: TaskProps) {
+  const [loading, setLoading] = React.useState(true);
+  const [taskDetails, setTaskDetails] = React.useState<TaskDetails | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchTaskDetails = async () => {
+      try {
+        const response = await fetch(`/api/task?id=${fetchID}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setTaskDetails(data.task);
+          } else {
+            setError(data.message);
+          }
+        } else {
+          setError('Failed to fetch task details');
+        }
+      } catch (err) {
+        setError('Error loading task details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTaskDetails();
+  }, [fetchID]);
+
+  if (loading || error) {
+    return (
+      <div className={`mb-3 p-4 rounded-lg ${
+        isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-white text-gray-800'
+      } shadow-sm`}>
+        <p className="text-sm">{loading ? 'Loading...' : error}</p>
+      </div>
+    );
   }
 
   return (
-    <div className={`task border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-400 bg-gray-200'} rounded-md w-11/12 h-14 mx-auto mt-4 flex flex-row`}>
-      <FormGroup>
-        <FormControlLabel
-          className="ml-5 my-auto"
-          control={
-            <Checkbox
-              disableRipple
-              sx={{
-                color: isDarkMode ? "white" : "black",
-                "&.Mui-checked": {
-                  color: isDarkMode ? "white" : "black",
-                },
-              }}
-            />
-          }
-          label={<span className={isDarkMode ? 'text-gray-200' : 'text-gray-800'}>{desc}</span>}
-        />
-      </FormGroup>
-      <LoadingButton
-        size="small"
-        className="h-3/5 my-auto ml-auto mr-5"
-        loading={loading}
-        loadingPosition="start"
-        startIcon={<SaveIcon />}
-        variant="contained"
-        onClick={handleClick}
-        sx={{
-          color: 'white',
-          borderColor: isDarkMode ? 'gray' : 'black',
-          background: isDarkMode ? 'gray' : 'black',
-          '&:hover': {
-            color: 'white',
-            background: isDarkMode ? 'darkgray' : 'gray',
-            borderColor: isDarkMode ? 'darkgray' : 'gray'
-          }
-        }}
-      >
-        Submit
-      </LoadingButton>
+    <div className={`mb-3 p-4 rounded-lg ${
+      isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-white text-gray-800'
+    } shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center gap-4`}>
+      {/* Project Name Badge */}
+      <div className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+        isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-600'
+      }`}>
+        {taskDetails?.projectName}
+      </div>
+
+      {/* Description */}
+      <div className="flex-grow">
+        <p className="text-sm break-words">{taskDetails?.description}</p>
+      </div>
+
+      {/* File Attachment */}
+      {taskDetails?.fileUrl && (
+        <a 
+          href={taskDetails.fileUrl}
+          className={`shrink-0 p-1.5 rounded-full hover:bg-opacity-10 ${
+            isDarkMode ? 'hover:bg-gray-300' : 'hover:bg-gray-600'
+          }`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Attached File"
+        >
+          📎
+        </a>
+      )}
+
+      {/* Date */}
+      <div className="text-xs opacity-75 whitespace-nowrap">
+        {new Date(taskDetails?.createdAt || '').toLocaleDateString()}
+      </div>
     </div>
   );
 }

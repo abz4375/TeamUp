@@ -15,6 +15,7 @@ import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import CreateTask from "./ManageProject/CreateTask";
 import Contributor from "./ManageProject/Contributor";
+import Task from './Task';
 
 interface Props {
   userDetail: {
@@ -35,6 +36,7 @@ function ManageProject(props: Props) {
   const [users, setUsers] = React.useState<any>([{ empty: true }]);
   const [emptyList, setEmptyList] = React.useState("");
   const [fetchAgain, setFetchAgain] = React.useState(props.projectToggle);
+  const [projectTasks, setProjectTasks] = React.useState<any[]>([]);
   const isDarkMode = props.isDarkMode;
 
   const [info, setInfo] = React.useState({
@@ -74,6 +76,26 @@ function ManageProject(props: Props) {
     fetchData();
   }, []);
 
+  React.useEffect(() => {
+    const fetchProjectTasks = async () => {
+      try {
+        const response = await fetch(`/api/task?projectId=${props.projectPageId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setProjectTasks(data.tasks);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+  
+    if (props.projectPageId) {
+      fetchProjectTasks();
+    }
+  }, [props.projectPageId]);
+
   const [open, setOpen] = React.useState(props.toggle || false);
   const [currentPage, setCurrentPage] = React.useState("tasks");
   const [createTask, setCreateTask] = React.useState(false);
@@ -82,12 +104,8 @@ function ManageProject(props: Props) {
     props.setProjectToggle(false);
   };
 
-  const [value, setValue] = React.useState([
-    {
-      name: props.userDetail.name,
-      emailId: props.userDetail.emailId,
-      profilePic: props.userDetail.profilePic,
-    },
+  const [value, setValue] = React.useState<any[]>([
+    
   ]);
 
   const handleCreateTask = async (taskData: any) => {
@@ -298,7 +316,7 @@ function ManageProject(props: Props) {
                       ? " hidden"
                       : "")
                   }
-                >
+                 >
                   <button
                     className={`hover:bg-blue-500 ml-4 mr-2 w-fit h-fit px-2 py-2 rounded-full transition flex flex-row my-auto ${
                       props.isDarkMode
@@ -344,10 +362,28 @@ function ManageProject(props: Props) {
                       fetchAgain={fetchAgain}
                       setEmptyList={setEmptyList}
                       setUsers={setUsers}
-                      // onCreateTask={handleCreateTask}
+                      projectName={info?.title}
+                      projectId={props.projectPageId}
+                      projectMembers={[info.owner, ...info.maintainers, ...info.contributors]}
                     />
                   )}
                 </div>
+                {currentPage === "tasks" && (
+                <>
+                  {/* Your existing Manage Task content */}
+                  
+                  {/* Add the task list */}
+                  <div className="task-list">
+                    {projectTasks.map((task) => (
+                      <Task 
+                        key={task.id}
+                        fetchID={task.id}
+                        isDarkMode={isDarkMode}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
               </div>
             </div>
           </ModalContent>

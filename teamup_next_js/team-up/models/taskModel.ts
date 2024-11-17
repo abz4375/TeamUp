@@ -3,8 +3,10 @@ import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
   description: { type: String, required: true },
-  assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  assignees: [{ type: String }],
   fileUrl: { type: String },
+  projectName: { type: String, required: true },
+  projectId: { type: mongoose.Schema.Types.ObjectId, required: true }, // Add this field
   createdAt: { type: Date, default: Date.now },
 });
 

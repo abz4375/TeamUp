@@ -21,6 +21,9 @@ interface CreateTaskProps {
   fetchAgain: boolean;
   setEmptyList: React.Dispatch<React.SetStateAction<string>>;
   setUsers: React.Dispatch<React.SetStateAction<any[]>>;
+  projectName: string;
+  projectId: string;
+  projectMembers: string[];
 }
 
 const CreateTask: React.FC<CreateTaskProps> = ({
@@ -36,7 +39,10 @@ const CreateTask: React.FC<CreateTaskProps> = ({
   onTaskCreated,
   fetchAgain,
   setEmptyList,
-  setUsers
+  setUsers,
+  projectName,
+  projectId,
+  projectMembers
 }) => {
   const [taskDescription, setTaskDescription] = React.useState("");
   const [uploadedFile, setUploadedFile] = React.useState<File | null>(null);
@@ -48,6 +54,18 @@ const CreateTask: React.FC<CreateTaskProps> = ({
 
 
   const handleSave = async () => {
+
+    // Validate assignees are project members
+    const invalidAssignees = value.filter(
+      user => !projectMembers.includes(user.emailId)
+    );
+
+    if (invalidAssignees.length > 0) {
+      setError(`Please add these users to the project first: ${invalidAssignees.map(u => u.emailId).join(', ')}`);
+      setIsLoading(false);
+      return;
+    }
+
     if (!taskDescription.trim()) {
       setError('Task description is required');
       return;
@@ -57,50 +75,40 @@ const CreateTask: React.FC<CreateTaskProps> = ({
     setError(null);
 
     try {
+      if(projectName==='') alert('not done')
       // Create FormData object
       const formData = new FormData();
       formData.append('description', taskDescription);
       formData.append('assignees', JSON.stringify(value.map((user) => user.emailId)));
-      
+      formData.append('projectName', projectName); 
+      formData.append('projectId', projectId);     
       if (uploadedFile) {
         formData.append('file', uploadedFile);
       }
 
-      // Send request directly to the API route
       const response = await fetch('/api/task', {
         method: 'POST',
-        body: formData, // FormData will set the correct Content-Type
+        body: formData,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`); // Fixed template literal syntax
-      }
 
       const data = await response.json();
 
       if (data.success) {
         // Clear the form
         setTaskDescription("");
-        setValue([
-          {
-            name: userDetail.name,
-            emailId: userDetail.emailId, // Fixed property name to match backend
-            profilePic: userDetail.profilePic,
-          },
-        ]);
+        setValue([{
+          name: userDetail.name,
+          emailId: userDetail.emailId,
+          profilePic: userDetail.profilePic,
+        }]);
         setUploadedFile(null);
-        
-        // Update the UI/state to show new task
-        setFetchAgain?.(true); // Added this based on context showing UI update pattern
-        
+
         // Notify parent component and close modal if exists
         onTaskCreated?.();
-        // setCreateTask?.(false); // Added this based on context showing modal closure pattern
-
+        setFetchAgain?.(true); // Added this based on context showing UI update pattern
       } else {
         throw new Error(data.message || 'Failed to create task');
       }
-      
     } catch (error) {
       console.error("Error saving task:", error);
       setError('Failed to create task. Please try again.');
@@ -108,6 +116,7 @@ const CreateTask: React.FC<CreateTaskProps> = ({
       setIsLoading(false);
     }
   };
+
 
   // Add this useEffect near the top of your component
 React.useEffect(() => {
@@ -203,13 +212,9 @@ React.useEffect(() => {
     value={value}
     onChange={(event, newValue) => {
       setValue([
-        {
-          name: userDetail.name,
-          emailId: userDetail.emailId,
-          profilePic: userDetail.profilePic,
-        },
+        // option
         ...newValue.filter(
-          (option) => option.emailId !== userDetail.emailId
+          (option) => 1
         ),
       ]);
       setUserSearchTerm(userSearchTerm);
@@ -260,7 +265,7 @@ React.useEffect(() => {
             label={option.name}
             avatar={<Avatar src={option.profilePic} />}
             {...getTagProps({ index })}
-            disabled={option.emailId === userDetail.emailId}
+            // disabled={option.emailId === userDetail.emailId}
             className={`m-1 transition-all ${
               isDarkMode
                 ? "bg-gray-700 text-gray-200"

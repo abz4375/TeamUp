@@ -94,7 +94,7 @@ const Project = (props: any) => {
     };
 
     fetchData();
-  }, []);
+  }, [fetchAgain, props.projectId]);
 
   if (info.owner !== "") {
     // fetching complete
@@ -300,7 +300,7 @@ function DeleteProjectPage(props: any) {
     };
 
     fetchData();
-  }, []);
+  }, [fetchAgain, props.projectPageId]);
 
   //   React.useEffect(() => {
   //     const fetchData = async () => {
@@ -621,8 +621,9 @@ function DeleteProjectPage(props: any) {
                   /> 
                 </FormGroup> */}
                 <div className=" h-1/3 overflow-x-hidden overflow-y-auto">
-                  {props.userDetail.projects.map((projectId: any) => (
+                  {props.userDetail.projects.map((projectId: any, index:any) => (
                     <Project
+                      key={index}
                       {...props}
                       type={"ownedByYou"}
                       projectId={projectId}
@@ -656,9 +657,10 @@ function DeleteProjectPage(props: any) {
                   </div>
                 </div>
                 <div className=" h-1/3 overflow-x-hidden overflow-y-auto">
-                  {props.userDetail.projects.map((projectId: any) => (
+                  {props.userDetail.projects.map((projectId: any, index:any) => (
                     <Project
                       {...props}
+                      key={index}
                       type={"ownedByOthers"}
                       projectId={projectId}
                       func={{
@@ -1195,6 +1197,7 @@ const Modal = React.forwardRef(function Modal(
     </Portal>
   );
 });
+Modal.displayName = 'Modal';
 
 const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean }>(
   (props, ref) => {
@@ -1206,6 +1209,7 @@ const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean }>(
     );
   }
 );
+Backdrop.displayName = 'Backdrop';
 
 const blue = {
   200: "#99CCFF",
