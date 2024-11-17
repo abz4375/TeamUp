@@ -224,6 +224,8 @@
 // export default Home;
 
 "use client";
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 import React, { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Profile from "./components/Profile";

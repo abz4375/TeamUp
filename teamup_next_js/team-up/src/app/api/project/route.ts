@@ -112,6 +112,13 @@ export async function POST(request: NextRequest) {
   if (toDelete) {
     console.log('toDelete part executed')
     try {
+      if (mongoose.connection.readyState !== 1) {
+        await mongoose.connect(process.env.MONGODB_URI+'', {
+            serverSelectionTimeoutMS: 15000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 15000,
+        });
+    }
       for (const projectId of toDelete) {
         const project = await Project.findOne({ _id: projectId });
         if (!project) continue;
@@ -139,6 +146,13 @@ export async function POST(request: NextRequest) {
   if (toLeave) {
     console.log('toLeave part executed')
     try {
+      if (mongoose.connection.readyState !== 1) {
+        await mongoose.connect(process.env.MONGODB_URI+'', {
+            serverSelectionTimeoutMS: 15000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 15000,
+        });
+    }
       for (const projectId of toLeave) {
         const project = await Project.findOne({ _id: projectId });
         if (!project) continue;

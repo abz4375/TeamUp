@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '../../../../models/userModel';
+import mongoose from 'mongoose';
 
 // export async function POST(request: NextRequest) {
 //     try {
@@ -56,6 +57,13 @@ export const maxDuration = 60 // Extend timeout to 60 seconds
 
 export async function POST(request: NextRequest) {
     try {
+        if (mongoose.connection.readyState !== 1) {
+            await mongoose.connect(process.env.MONGODB_URI+'', {
+                serverSelectionTimeoutMS: 15000,
+                socketTimeoutMS: 45000,
+                connectTimeoutMS: 15000,
+            });
+        }
         const body = await request.json(); // Parse the JSON data from the request body
 
         const userData = {

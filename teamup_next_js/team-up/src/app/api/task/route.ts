@@ -17,6 +17,13 @@ const uploadDir = join(process.cwd(), 'public', 'uploads');
 
 export async function POST(request: NextRequest) {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGODB_URI+'', {
+          serverSelectionTimeoutMS: 15000,
+          socketTimeoutMS: 45000,
+          connectTimeoutMS: 15000,
+      });
+  }
     const { fields, fileUrl } = await parseForm(request, uploadDir);
     
     // Extract task details

@@ -101,7 +101,6 @@ function CreateTeamPage(props: any) {
   const handleSubmit = async () => {
     setAwaitSubmit(true);
     const contributors = Array.from(new Set(value.map((user) => user.emailId)));
-
     const data = {
       title: projectTitle,
       description: projDescMarkdown,
@@ -111,38 +110,27 @@ function CreateTeamPage(props: any) {
       tasks: [],
       contributions: [],
     };
-    if ((!data.title || data.title === "") && data.contributors.length === 1) {
-      setAwaitSubmit(false);
-      return;
-    }
-    const baseURL = process.env.VERCEL_URL
-    const url = `/api/create-project`;
+    
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      //   console.log(response);
-
-      if (response.status === 201) {
-        // const responseJson = await response.json();
-        // console.log("Signup successful:", responseJson);
-        // Handle successful signup (e.g., redirect to login page)
-        setAwaitSubmit(false);
-        props.setRefreshHomePage(true);
-        handleClose();
-      } else {
-        console.error("Project Creation failed:", response.statusText);
-        setAwaitSubmit(false);
-        // Handle signup errors (e.g., display error message)
-      }
+        const response = await fetch('/api/create-project', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            // Add timeout configuration
+            signal: AbortSignal.timeout(45000) // 45 second timeout
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        // Handle success
     } catch (error) {
-      setAwaitSubmit(false);
-      console.error("Error creating Project:", error);
-      // Handle network or other errors
+        console.error('Error:', error);
+        setAwaitSubmit(false);
+        // Handle error appropriately
     }
-  };
+}
+
 
   const fixedOptions = [top100Films[6]];
   const fixedOptionsTemp: any = [];
