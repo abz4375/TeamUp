@@ -8,6 +8,9 @@ import formidable, { Fields, Files } from 'formidable';
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
 
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // Extend timeout to 60 seconds
+
 // Define uploadDir constant
 const uploadDir = join(process.cwd(), 'public', 'uploads');
 
@@ -216,4 +219,3 @@ export async function GET(request: NextRequest) {
 }
 
 export const runtime = 'nodejs' // optional
-export const dynamic = 'force-dynamic' // optional

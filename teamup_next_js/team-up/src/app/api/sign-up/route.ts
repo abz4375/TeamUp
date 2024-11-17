@@ -51,6 +51,9 @@ import { User } from '../../../../models/userModel';
 // Connect to MongoDB (establish the connection only once)
 // mongoose.connect(MONGO_URI);
 
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // Extend timeout to 60 seconds
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json(); // Parse the JSON data from the request body

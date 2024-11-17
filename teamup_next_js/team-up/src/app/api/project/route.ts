@@ -8,6 +8,11 @@ import { User } from '../../../../models/userModel';
 //   .then(() => console.log('mongo connected'))
 //   .catch(err => console.error('Error connecting to MongoDB:', err));
 */
+
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // Extend timeout to 60 seconds
+
+
 export async function GET(request: NextRequest) {
 
   /*

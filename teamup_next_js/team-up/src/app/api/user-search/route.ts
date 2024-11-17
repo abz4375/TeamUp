@@ -3,6 +3,7 @@ import { User } from '../../../../models/userModel';
 import mongoose from 'mongoose'; // Import mongoose
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // Extend timeout to 60 seconds
 
 export async function GET(request: NextRequest) {
 
