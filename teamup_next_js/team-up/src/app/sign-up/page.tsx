@@ -25,9 +25,7 @@ const SignUp = () => {
       emailId,
       password,
     };
-    const baseURL = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    const baseURL = process.env.VERCEL_URL
     const url = `${baseURL}/api/sign-up`;
 
     try {

@@ -272,9 +272,7 @@ const Home = () => {
     // }, 10000);
     const fetchData = async () => {
       // Get the base URL depending on the environment
-      const baseURL = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+      const baseURL = process.env.VERCEL_URL
       const response = await fetch(`${baseURL}/api/userinfo`);
       if (response.ok) {
         const responseJson = await response.json();

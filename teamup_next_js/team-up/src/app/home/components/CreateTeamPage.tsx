@@ -37,9 +37,7 @@ function CreateTeamPage(props: any) {
     const fetchData = async () => {
       if (fetchAgain && userSearchTerm !== "") {
         setTimeout(async () => {
-          const baseURL = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+          const baseURL = process.env.VERCEL_URL
           const response = await fetch(
             `${baseURL}/api/user-search?t=` + userSearchTerm
           );
@@ -117,9 +115,7 @@ function CreateTeamPage(props: any) {
       setAwaitSubmit(false);
       return;
     }
-    const baseURL = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    const baseURL = process.env.VERCEL_URL
     const url = `${baseURL}/api/create-project`;
     try {
       const response = await fetch(url, {

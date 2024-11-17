@@ -7,9 +7,7 @@ export const UserInfo = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const baseURL = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+      const baseURL = process.env.VERCEL_URL
       const response = await fetch(`${baseURL}/api/auth/user`);
       if (response.ok) {
         const responseJson = await response.json();
