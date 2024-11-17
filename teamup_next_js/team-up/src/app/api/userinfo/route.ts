@@ -6,8 +6,6 @@ import { User } from "../../../../models/userModel";
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // Extend timeout to 60 seconds
 
-export const runtime = 'edge'
-
 export async function GET(request:NextRequest) {
     const session = await auth();
     const googleUser =session?.user;
