@@ -7,6 +7,7 @@ import { Project } from '../../../../models/projectModel';
 import formidable, { Fields, Files } from 'formidable';
 import { Readable } from 'stream';
 import { IncomingMessage } from 'http';
+import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // Extend timeout to 60 seconds
@@ -153,6 +154,13 @@ async function parseForm(req: NextRequest, uploadDir: string): Promise<{ fields:
 
 export async function GET(request: NextRequest) {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGODB_URI+'', {
+          serverSelectionTimeoutMS: 15000,
+          socketTimeoutMS: 45000,
+          connectTimeoutMS: 15000,
+      });
+  }
     const taskId = request.nextUrl.searchParams.get('id');
     const projectId = request.nextUrl.searchParams.get('projectId');
     

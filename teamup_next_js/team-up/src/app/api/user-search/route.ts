@@ -13,6 +13,14 @@ export async function GET(request: NextRequest) {
     try {
       // Connect to MongoDB before using the User model
 
+      if (mongoose.connection.readyState !== 1) {
+        await mongoose.connect(process.env.MONGODB_URI+'', {
+            serverSelectionTimeoutMS: 15000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 15000,
+        });
+    }
+
       const queryParams = new URLSearchParams(request.nextUrl.searchParams);
       // const id: any = queryParams.get('id') || null;
       // const firstName: any = queryParams.get('firstName') || null; // Get first-name param (optional)

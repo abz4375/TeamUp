@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Project } from '../../../../models/projectModel';
 import { User } from '../../../../models/userModel';
+import mongoose from 'mongoose';
 /*
 // const mongoose = require('mongoose');
 
@@ -26,6 +27,13 @@ export async function GET(request: NextRequest) {
     // await mongoose.connect(process.env.MONGODB_URI+'')
     // console.log('mongo connected')
     */
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGODB_URI+'', {
+          serverSelectionTimeoutMS: 15000,
+          socketTimeoutMS: 45000,
+          connectTimeoutMS: 15000,
+      });
+  }
     const queryParams = new URLSearchParams(request.nextUrl.searchParams);
     /*
     // const id: any = queryParams.get('id') || null;
