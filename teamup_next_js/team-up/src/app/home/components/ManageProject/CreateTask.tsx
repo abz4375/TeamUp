@@ -153,13 +153,14 @@ React.useEffect(() => {
 
   return (
     <div
-      className={`w-full h-fit flex flex-row shadow-sm ${
+      className={`w-full h-fit flex flex-col md:flex-row shadow-sm ${
         isDarkMode ? "bg-dark-bg-secondary" : "bg-white"
       }`}
     >
-      <div className="w-2/3 m-1">
+      {/* Left section - Task Description and Assignees */}
+      <div className="w-full md:w-2/3 m-1">
         <textarea
-          className={`w-full border-2 rounded-md p-4 text-2xl flex flex-col overflow-auto resize-none h-60 ${
+          className={`w-full border-2 rounded-md p-2 md:p-4 text-lg md:text-2xl flex flex-col overflow-auto resize-none h-48 md:h-60 ${
             isDarkMode
               ? "bg-gray-800 text-dark-text border-dark-border"
               : "bg-white text-black border-blue-900 border-opacity-10"
@@ -168,16 +169,21 @@ React.useEffect(() => {
           value={taskDescription}
           onChange={(e) => setTaskDescription(e.target.value)}
         ></textarea>
-        <form action={() => {}} className="mx-auto grid w-full h-20 mt-3">
-        <div
-  className={`mx-auto flex flex-row text-lg w-full h-full border-none rounded-md ${
-    isDarkMode ? "bg-dark-bg-secondary" : "bg-white"
-  }`}
->
+        <form action={() => {}} className="mx-auto grid w-full h-auto md:h-20 mt-3">
+          <div
+            className={`mx-auto flex flex-row text-base md:text-lg w-full h-full border-none rounded-md ${
+              isDarkMode ? "bg-dark-bg-secondary" : "bg-white"
+            }`}
+          >
   <Autocomplete
-    className="ml-2 mr-auto my-auto"
+    className="ml-2 mr-auto my-auto w-full"
     sx={(theme) => ({
-      width: "80vw",
+      width: {
+        xs: "90vw",
+        sm: "85vw",
+        md: "80vw",
+        lg: "600px"
+      },
       "& .MuiInputBase-root": {
         color: isDarkMode
           ? theme.palette.grey[100]
@@ -315,16 +321,17 @@ React.useEffect(() => {
         </form>
       </div>
 
-      <div className="flex flex-col w-1/3">
+      {/* Right section - File Upload and Save Button */}
+      <div className="flex flex-col w-full md:w-1/3 mt-4 md:mt-0">
         <div
-          className={`border rounded-md m-1 flex flex-col overflow-hidden h-60 ${
+          className={`border rounded-md m-1 flex flex-col overflow-hidden h-48 md:h-60 ${
             isDarkMode
               ? "bg-dark-bg-secondary border-dark-border"
               : "bg-white border-gray-600 border-opacity-15"
           }`}
         >
           <span
-            className={`mt-0 w-full px-4 py-2 font-light text-xl h-fit text-center border-b-2 ${
+            className={`mt-0 w-full px-2 md:px-4 py-2 font-light text-lg md:text-xl h-fit text-center border-b-2 ${
               isDarkMode
                 ? "bg-dark-bg-secondary text-dark-text border-dark-border"
                 : "bg-white text-black border-gray-400"
@@ -367,21 +374,21 @@ React.useEffect(() => {
           </div>
         </div>
         <button
-    className={`h-20 m-2 border-2 rounded-lg text-lg font-semibold transition-all ${
-      isDarkMode
-        ? "border-green-700 bg-green-900 text-green-100 active:bg-green-800"
-        : "border-green-500 bg-green-100 text-green-900 active:bg-green-200"
-    } ${isLoading || !taskDescription.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-    onClick={handleSave}
-    disabled={isLoading || !taskDescription.trim()}
-  >
-    {isLoading ? '⏳ Saving...' : '💾 Save'}
-  </button>
-  {error && (
-    <div className={`text-red-500 text-sm mt-2 text-center ${isDarkMode ? 'text-red-400' : ''}`}>
-      {error}
-    </div>
-  )}
+          className={`h-16 md:h-20 m-2 border-2 rounded-lg text-base md:text-lg font-semibold transition-all ${
+            isDarkMode
+              ? "border-green-700 bg-green-900 text-green-100 active:bg-green-800"
+              : "border-green-500 bg-green-100 text-green-900 active:bg-green-200"
+          } ${isLoading || !taskDescription.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleSave}
+          disabled={isLoading || !taskDescription.trim()}
+        >
+          {isLoading ? '⏳ Saving...' : '💾 Save'}
+        </button>
+        {error && (
+          <div className={`text-red-500 text-sm mt-2 text-center ${isDarkMode ? 'text-red-400' : ''}`}>
+            {error}
+          </div>
+        )}
       </div>
     </div>
   );
