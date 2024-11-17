@@ -124,6 +124,14 @@ function CreateTeamPage(props: any) {
             throw new Error('Network response was not ok');
         }
         // Handle success
+        if (response.status === 201) {
+          // const responseJson = await response.json();
+          // console.log("Signup successful:", responseJson);
+          // Handle successful signup (e.g., redirect to login page)
+          setAwaitSubmit(false);
+          props.setRefreshHomePage(true);
+          handleClose();
+        }
     } catch (error) {
         console.error('Error:', error);
         setAwaitSubmit(false);
