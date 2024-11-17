@@ -14,6 +14,12 @@ export async function GET(request:NextRequest) {
     try {
         // Connect to MongoDB before using the User model
         // await mongoose.connect(process.env.MONGODB_URI+'');
+        if (mongoose.connection.readyState !== 1) {
+          await mongoose.connect(process.env.MONGODB_URI+'', {
+              serverSelectionTimeoutMS: 15000,
+              socketTimeoutMS: 45000,
+          });
+      }
         const user = await User.find({emailId:googleUser?.email}); // Find users based on the filter
     
         if (!user.length) {
