@@ -39,7 +39,7 @@ const Project = (props: any) => {
           ? `https://${process.env.VERCEL_URL}`
           : 'http://localhost:3000';
         const response = await fetch(
-          `${baseURL}/api/project?id=` +
+          `/api/project?id=` +
             props.projectId +
             "&info=forDashboard"
         );

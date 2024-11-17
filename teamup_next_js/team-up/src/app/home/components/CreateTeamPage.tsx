@@ -39,7 +39,7 @@ function CreateTeamPage(props: any) {
         setTimeout(async () => {
           const baseURL = process.env.VERCEL_URL
           const response = await fetch(
-            `${baseURL}/api/user-search?t=` + userSearchTerm
+            `/api/user-search?t=` + userSearchTerm
           );
           if (response.ok) {
             const responseJson = await response.json();
@@ -116,7 +116,7 @@ function CreateTeamPage(props: any) {
       return;
     }
     const baseURL = process.env.VERCEL_URL
-    const url = `${baseURL}/api/create-project`;
+    const url = `/api/create-project`;
     try {
       const response = await fetch(url, {
         method: "POST",

@@ -56,7 +56,7 @@ function ManageProject(props: Props) {
       if (fetchAgain && props.projectPageId) {
         const baseURL = process.env.VERCEL_URL
         const response = await fetch(
-          `${baseURL}/api/project?id=` + props.projectPageId
+          `/api/project?id=` + props.projectPageId
         );
         if (response.ok) {
           const responseJson = await response.json();

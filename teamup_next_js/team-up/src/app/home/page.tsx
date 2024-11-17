@@ -273,7 +273,7 @@ const Home = () => {
     const fetchData = async () => {
       // Get the base URL depending on the environment
       const baseURL = process.env.VERCEL_URL
-      const response = await fetch(`${baseURL}/api/userinfo`);
+      const response = await fetch(`/api/userinfo`);
       if (response.ok) {
         const responseJson = await response.json();
 

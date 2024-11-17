@@ -26,7 +26,7 @@ const SignUp = () => {
       password,
     };
     const baseURL = process.env.VERCEL_URL
-    const url = `${baseURL}/api/sign-up`;
+    const url = `/api/sign-up`;
 
     try {
       const response = await fetch(url, {
