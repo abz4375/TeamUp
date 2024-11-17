@@ -35,8 +35,11 @@ const Project = (props: any) => {
       // console.log('fetch again:',fetchAgain,'projectid:',props.projectId)
       if (fetchAgain && props.projectId) {
         // setTimeout(async() => {
+          const baseURL = process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000';
         const response = await fetch(
-          "http://localhost:3000/api/project?id=" +
+          `${baseURL}/api/project?id=` +
             props.projectId +
             "&info=forDashboard"
         );

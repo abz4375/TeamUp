@@ -54,8 +54,11 @@ function ManageProject(props: Props) {
   React.useEffect(() => {
     const fetchData = async () => {
       if (fetchAgain && props.projectPageId) {
+        const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
         const response = await fetch(
-          "http://localhost:3000/api/project?id=" + props.projectPageId
+          `${baseURL}/api/project?id=` + props.projectPageId
         );
         if (response.ok) {
           const responseJson = await response.json();

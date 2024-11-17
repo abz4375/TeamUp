@@ -25,8 +25,10 @@ const SignUp = () => {
       emailId,
       password,
     };
-
-    const url = "http://localhost:3000/api/sign-up";
+    const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    const url = `${baseURL}/api/sign-up`;
 
     try {
       const response = await fetch(url, {

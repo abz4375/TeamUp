@@ -17,8 +17,11 @@ const Contributor: React.FC<ContributorProps> = ({ contributorEmailId, isDarkMod
   useEffect(() => {
     const fetchData = async () => {
       if (fetchAgain && contributorEmailId) {
+        const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
         const response = await fetch(
-          "http://localhost:3000/api/user-search?t=" + contributorEmailId
+          `${baseURL}/api/user-search?t=` + contributorEmailId
         );
         if (response.ok) {
           const responseJson = await response.json();

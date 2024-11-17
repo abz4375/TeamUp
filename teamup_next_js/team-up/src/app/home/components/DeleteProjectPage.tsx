@@ -68,8 +68,11 @@ const Project = (props: any) => {
       // console.log('fetch again:',fetchAgain,'projectid:',props.projectId)
       if (fetchAgain && props.projectId) {
         // setTimeout(async() => {
+          const baseURL = process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000';
         const response = await fetch(
-          "http://localhost:3000/api/project?id=" +
+          `${baseURL}/api/project?id=` +
             props.projectId +
             "&info=forDeletePage"
         );
@@ -265,8 +268,11 @@ function DeleteProjectPage(props: any) {
       // console.log('fetch again:',fetchAgain,'projectid:',props.projectPageId)
       if (fetchAgain && props.projectPageId) {
         // setTimeout(async() => {
+          const baseURL = process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000';
         const response = await fetch(
-          "http://localhost:3000/api/project?id=" + props.projectPageId
+          `${baseURL}/api/project?id=` + props.projectPageId
         );
         if (response.ok) {
           const responseJson = await response.json();
@@ -382,7 +388,10 @@ function DeleteProjectPage(props: any) {
       setAwaitSubmit(false);
       return;
     }
-    const url = "http://localhost:3000/api/create-project";
+    const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    const url = `${baseURL}/api/create-project`;
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -468,7 +477,10 @@ function DeleteProjectPage(props: any) {
     setAwaitSubmit(true); // Show loading state
   
     try {
-      const response = await fetch("http://localhost:3000/api/project", {
+      const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+      const response = await fetch(`${baseURL}/api/project`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -512,7 +524,10 @@ function DeleteProjectPage(props: any) {
   const onLeave = async () => {
     if (!toLeave.length) return;
     console.log("projects to leave: ", toLeave);
-    const url = "http://localhost:3000/api/project";
+    const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    const url = `${baseURL}/api/project`;
     try {
       const response = await fetch(url, {
         method: "POST",
