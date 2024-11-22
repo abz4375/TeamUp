@@ -176,11 +176,12 @@ function ManageProject(props: Props) {
         <Fade in={open}>
           <ModalContent
             sx={style}
-            className={`w-4/5 h-4/5 overflow-auto overflow-x-hidden ${
-              props.isDarkMode
-                ? "bg-dark-bg text-dark-text"
-                : "bg-white text-black"
-            }`}
+            className={`overflow-auto overflow-x-hidden
+              ${props.isDarkMode ? "bg-dark-bg text-dark-text" : "bg-white text-black"}
+              w-full md:w-4/5 lg:w-3/4 xl:w-2/3  // Responsive widths
+              h-[95vh] md:h-4/5                   // Responsive heights
+              p-2 md:p-4 lg:p-6                   // Responsive padding
+            `}
             isDarkMode={props.isDarkMode}
           >
             <div
@@ -192,7 +193,7 @@ function ManageProject(props: Props) {
               <span className="my-auto font-semibold">{info?.title}</span>
               <button
                 className={
-                  " ml-4 text-lg w-fit h-full p-1 border-2 rounded-md flex flex-row my-auto hover:border-blue-500 transition-all" +
+                  "w-full h-full flex flex-col md:flex-row ml-4 text-lg p-1 border-2 rounded-md my-auto hover:border-blue-500 transition-all" +
                   (currentPage === "info" && !props.isDarkMode
                     ? " bg-blue-50 border-blue-500"
                     : "bg-blue-900 border-blue-500") +
@@ -553,7 +554,18 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: {
+    xs: '95%', // Full width on mobile with small margins
+    sm: '80%', // Slightly smaller on tablets
+    md: '70%', // Medium screens
+    lg: '60%', // Desktop
+    xl: '50%'  // Large screens
+  },
+  maxHeight: {
+    xs: '95vh', // Almost full height on mobile
+    sm: '90vh', // Slightly smaller on tablets
+    md: '85vh'  // Comfortable height on larger screens
+  }
 };
 interface ModalContentProps {
   isDarkMode: boolean;

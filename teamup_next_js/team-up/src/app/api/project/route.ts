@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Project } from '../../../../models/projectModel';
 import { User } from '../../../../models/userModel';
+import { Task } from '../../../../models/taskModel';
 import mongoose from 'mongoose';
 /*
 // const mongoose = require('mongoose');
@@ -122,6 +123,20 @@ export async function POST(request: NextRequest) {
       for (const projectId of toDelete) {
         const project = await Project.findOne({ _id: projectId });
         if (!project) continue;
+
+        // 1. Get all tasks associated with the project
+        const projectTasks = await Task.find({ projectId: projectId });
+
+        // 2. Remove tasks from all users who have these tasks
+        for (const task of projectTasks) {
+            await User.updateMany(
+                { tasks: task._id },
+                { $pull: { tasks: task._id } }
+            );
+        }
+
+        // 3. Delete all tasks associated with the project
+        await Task.deleteMany({ projectId: projectId });
         
         for (const contributorEmail of project.contributors) {
           const user = await User.findOne({ emailId: contributorEmail });
