@@ -1,21 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tooltip } from "@mui/material";
 import "./sidebar.css";
 import GroupAddRoundedIcon from '@mui/icons-material/GroupAddRounded';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import MenuIcon from '@mui/icons-material/Menu'; // Added hamburger menu icon
-import CloseIcon from '@mui/icons-material/Close'; // Added close icon
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import logo from "../../assets/logo.png";
 
 const Sidebar = (props: any) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [width, setWidth] = useState(0);
   const [isHidden, setIsHidden] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Set width after component mounts
     setWidth(window.innerWidth);
     const handleResize = () => {
       setWidth(window.innerWidth);
@@ -25,11 +26,25 @@ const Sidebar = (props: any) => {
       }
     };
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (width < 640 && 
+          sidebarRef.current && 
+          buttonRef.current &&
+          !sidebarRef.current.contains(event.target as Node) &&
+          !buttonRef.current.contains(event.target as Node)) {
+        setIsHidden(true);
+      }
+    };
+
     window.addEventListener('resize', handleResize);
-    handleResize(); // Initial check
+    document.addEventListener('mousedown', handleClickOutside);
+    handleResize();
     
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [width]);
 
   const handleCreateTeam = () => {
     props.funcToPass(true);
@@ -39,37 +54,34 @@ const Sidebar = (props: any) => {
     <>
       {width < 640 && (
         <button
-        className={`fixed top-4 left-4 z-50
-          p-2 rounded-full transition-all duration-300
-         ba bg-opacity-30
-          ${props.isDarkMode 
-            ? 'bg-gray-800 text-white hover:bg-gray-700' 
-            : 'bg-white text-gray-800 hover:bg-gray-50'
-          } ${!isHidden ? 'shadow-lg' : ''}`}
-        onClick={() => setIsHidden(!isHidden)}
-      >
-        {isHidden 
-          ? <MenuIcon sx={{ fontSize: '1.5rem' }} />
-          : <CloseIcon sx={{ fontSize: '1.5rem' }} />
-        }
-      </button>
+          ref={buttonRef}
+          className={`fixed top-4 left-4 z-50
+            p-2 rounded-full transition-all duration-300
+            ${props.isDarkMode 
+              ? 'bg-gray-800/80 text-gray-200 hover:bg-gray-700' 
+              : 'bg-white/80 text-gray-800 hover:bg-gray-50'
+            } ${!isHidden ? 'shadow-lg' : ''}`}
+          onClick={() => setIsHidden(!isHidden)}
+        >
+          {isHidden 
+            ? <MenuIcon sx={{ fontSize: '1.5rem' }} />
+            : <CloseIcon sx={{ fontSize: '1.5rem' }} />
+          }
+        </button>
       )}
       
       <div 
-  className={`transition-all duration-300 ease-in-out flex flex-col border-r-2 
-    ${width < 640 
-      ? 'fixed h-full z-40 backdrop-blur-md bg-white/30' 
-      : 'relative h-screen'} 
-    ${isHidden && width < 640 ? '-translate-x-full' : 'translate-x-0'}
-    ${props.isDarkMode 
-      ? width < 640 
-        ? 'bg-gray-800/30' 
-        : 'bg-dark-bg' 
-      : width < 640 
-        ? 'bg-white/30' 
-        : 'bg-gray-50'}`}
->
-
+        ref={sidebarRef}
+        className={`transition-all duration-300 ease-in-out flex flex-col 
+          ${width < 640 
+            ? 'fixed h-full z-40 backdrop-blur-md' 
+            : 'relative h-screen'} 
+          ${isHidden && width < 640 ? '-translate-x-full' : 'translate-x-0'}
+          ${props.isDarkMode 
+            ? `border-gray-700 ${width < 640 ? 'bg-gray-800/80' : 'bg-gray-900'}`
+            : `border-gray-200 ${width < 640 ? 'bg-white/80' : 'bg-gray-50'}`}
+          border-r-2`}
+      >
         <img 
           src={logo.src} 
           className="w-16 mx-auto mt-3"
@@ -77,11 +89,14 @@ const Sidebar = (props: any) => {
         />
         
         <div className="flex flex-col gap-4 mt-16">
-          <div className="flex items-center mx-4 hover:bg-opacity-80 transition rounded-lg">
+          <div className={`flex items-center mx-4 hover:bg-opacity-80 transition rounded-lg
+            ${props.isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}>
             <Tooltip title="Create Team" placement="right">
               <button
-                className="p-2 border-2 rounded-full transition
-                  border-amber-900 bg-amber-900"
+                className={`p-2 border-2 rounded-full transition
+                  ${props.isDarkMode 
+                    ? 'border-amber-500 bg-amber-500 hover:bg-amber-600' 
+                    : 'border-amber-900 bg-amber-900 hover:bg-amber-800'}`}
                 onClick={handleCreateTeam}
               >
                 <GroupAddRoundedIcon 
@@ -90,15 +105,22 @@ const Sidebar = (props: any) => {
               </button>
             </Tooltip>
             {width < 640 && !isHidden && (
-              <span className="ml-3 text-sm">Create Team</span>
+              <span className={`ml-3 text-sm ${
+                props.isDarkMode ? 'text-gray-200' : 'text-gray-800'
+              }`}>
+                Create Team
+              </span>
             )}
           </div>
 
-          <div className="flex items-center mx-4 hover:bg-opacity-80 transition rounded-lg">
+          <div className={`flex items-center mx-4 hover:bg-opacity-80 transition rounded-lg
+            ${props.isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}>
             <Tooltip title="Delete Project" placement="right">
               <button
                 className={`p-2 border-2 rounded-full transition
-                  ${props.isDarkMode ? 'border-red-500 bg-red-500' : 'border-red-700 bg-red-700'}`}
+                  ${props.isDarkMode 
+                    ? 'border-red-500 bg-red-500 hover:bg-red-600' 
+                    : 'border-red-700 bg-red-700 hover:bg-red-800'}`}
                 onClick={() => props.setDeleteProjectPage(true)}
               >
                 <DeleteForeverIcon 
@@ -107,7 +129,11 @@ const Sidebar = (props: any) => {
               </button>
             </Tooltip>
             {width < 640 && !isHidden && (
-              <span className="ml-3 text-sm">Delete Project</span>
+              <span className={`ml-3 text-sm ${
+                props.isDarkMode ? 'text-gray-200' : 'text-gray-800'
+              }`}>
+                Delete Project
+              </span>
             )}
           </div>
         </div>

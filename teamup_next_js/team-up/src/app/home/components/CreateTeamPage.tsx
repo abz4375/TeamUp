@@ -19,10 +19,11 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { twilight, vs, vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import LoadingButton from "@mui/lab/LoadingButton";
 import { Popper } from "@mui/base";
+import { xonokai } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 function CreateTeamPage(props: any) {
   const [userSearchTerm, setUserSearchTerm] = React.useState("");
@@ -182,7 +183,7 @@ function CreateTeamPage(props: any) {
         <Fade in={open}>
           <ModalContent
             sx={style}
-            className={`w-2/3 h-3/4 ${
+            className={` ${
               isDarkMode
                 ? "bg-gray-800 text-gray-200"
                 : "bg-white text-gray-900"
@@ -206,58 +207,57 @@ function CreateTeamPage(props: any) {
                 (currentPage !== 0 ? " hidden" : "")
               }
             >
-              <form action={() => {}} className=" mx-auto my-2 grid w-full">
-                <div className="mx-auto my-2 flex flex-row text-lg w-full">
-                  <span className="my-auto text-left mr-4 w-1/4">
-                    Project Title:{" "}
-                  </span>
-                  <input
-                    type="text"
-                    name="projectTitle"
-                    placeholder="Project Title"
-                    className={`my-auto w-3/4 px-4 py-2 rounded-md focus:outline-blue-300 transition ${
-                      isDarkMode
-                        ? "bg-gray-700 text-gray-200 border-gray-600"
-                        : "bg-white text-gray-900 border-gray-300"
-                    } border-2`}
-                    onChange={(e) => setProjectTitle(e.target.value)}
-                  />
-                </div>
-                <div className="mx-auto my-2 flex flex-row text-lg w-full">
-                  <div className=" mr-4 w-1/4 border-none border-red-500 flex flex-col">
-                    <div className="text-left">Project Description: </div>
+              <form action={() => {}} className="mx-auto my-2 grid w-full gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+    <span className="text-left md:w-1/4 text-lg">Project Title: </span>
+    <input
+      type="text"
+      name="projectTitle"
+      placeholder="Project Title"
+      className={`w-full md:w-3/4 px-4 py-2 rounded-md focus:outline-blue-300 transition ${
+        isDarkMode
+          ? "bg-gray-700 text-gray-200 border-gray-600"
+          : "bg-white text-gray-900 border-gray-300"
+      } border-2`}
+      onChange={(e) => setProjectTitle(e.target.value)}
+    />
+  </div>
+  <div className="flex flex-col md:flex-row gap-4">
+    <div className="md:w-1/4 flex flex-col gap-2">
+      <div className="text-left">Project Description: </div>
                     <button
-                      className={
+                      className={`w-full px-4 py-2 rounded-md transition ${
                         !toShowMarkdownPreview
-                          ? " ml-auto mr-0 mt-2 mb-auto w-full border-2 border-dashed border-blue-200 px-4 py-2 text-blue-500 rounded-md hover:border-blue-300 active:border-blue-200 transition flex flex-row font-mono text-base font-normal"
-                          : " ml-auto mr-0 mt-2 mb-auto w-full px-4 py-2 text-white bg-blue-500 border-2 border-blue-500 rounded-md hover:opacity-90 transition flex flex-row font-mono text-base font-normal"
-                      }
+                          ? "border-2 border-dashed border-blue-200 text-blue-500 hover:border-blue-300"
+                          : "bg-blue-500 text-white hover:opacity-90"
+                      }`}
                       onClick={() => {
                         setToShowMarkdownPreview(!toShowMarkdownPreview);
                       }}
                     >
-                      <WysiwygIcon className=" border-none border-red-500 my-auto h-full mr-2" />
+                      <WysiwygIcon className=" mr-2" />
                       {/* <ChevronLeftIcon className=" border-none border-red-500 my-auto h-full" /> */}
                       Markdown Preview
                     </button>
                   </div>
-                  <div className="my-auto w-3/4 flex flex-col">
-                    <textarea
-                      name="projectDesc"
-                      placeholder={placeholderDesc}
-                      rows={9}
-                      className={`px-4 py-2 rounded-md focus:outline-blue-300 active:outline-blue-300 transition resize-y font-mono text-sm ${
-                        isDarkMode
-                          ? "bg-gray-700 text-gray-200 border-gray-600"
-                          : "bg-white text-gray-900 border-gray-300"
-                      } border-2`}
-                      onChange={(e) => handleMarkdownPreview(e)}
-                      value={projDescMarkdown}
-                    />
+                  <div className="md:w-3/4 flex flex-col gap-4">
+                  <textarea
+        name="projectDesc"
+        placeholder={placeholderDesc}
+        rows={9}
+        className={`w-full px-4 py-2 rounded-md focus:outline-blue-300 transition resize-y font-mono text-sm ${
+          isDarkMode
+            ? "bg-gray-700 text-gray-200 border-gray-600"
+            : "bg-white text-gray-900 border-gray-300"
+        } border-2`}
+        onChange={(e) => handleMarkdownPreview(e)}
+        value={projDescMarkdown}
+        wrap="true"
+      />
 
                     <div
                       className={
-                        " bg-amber-20 bg-opacity-40 p-2 border-2 border-gray-200 rounded-md mt-4" +
+                        "w-full p-4 border-2 border-gray-200 rounded-md" +
                         (toShowMarkdownPreview === true ? "" : " hidden")
                       }
                     >
@@ -274,7 +274,7 @@ function CreateTeamPage(props: any) {
 
                       <Markdown
                         // className={' pt-2' + (toShowMarkdownPreview)?'':' hidden'}
-                        className=" text-md mt-2"
+                        className="w-full text-md mt-2"
                         remarkPlugins={[remarkGfm]}
                         children={projDescMarkdown}
                         components={{
@@ -291,7 +291,8 @@ function CreateTeamPage(props: any) {
                                 children={String(children).replace(/\n$/, "")}
                                 language={match[1]}
                                 ref={null}
-                                style={vs}
+                                style={vscDarkPlus}
+                                wrapLines={true}
                               />
                             ) : (
                               <div
@@ -327,7 +328,7 @@ function CreateTeamPage(props: any) {
               >
                 <div className="mx-auto my-2 flex flex-row text-lg w-full h-full ">
                   <Autocomplete
-                    className="mx-auto"
+                    className="w-full max-w-full mx-auto"
                     multiple
                     id="fixed-tags-demo"
                     value={value}
@@ -399,7 +400,7 @@ function CreateTeamPage(props: any) {
                         </Tooltip>
                       ))
                     }
-                    style={{ width: 600 }}
+                    style={{ width: "100%" }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -442,20 +443,20 @@ function CreateTeamPage(props: any) {
                     }}
                   />
                 </div>
-                <div className=" transition-all border-2 border-gray-200 rounded-full w-fit mx-auto mb-16 mt-auto h-fit hover:border-gray-300">
-                  {value.map((member, index) => {
-                    return (
-                      <Tooltip title={member.emailId} key={index}>
-                        <Chip
-                          label={member.name}
-                          avatar={<Avatar src={member.profilePic} />}
-                          // id={index}
-                          className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75 hover:bg-green-100"
-                        />
-                      </Tooltip>
-                    );
-                  })}
-                </div>
+                <div className="hidden md:block transition-all border-2 border-gray-200 rounded-full w-fit mx-auto mb-16 h-fit hover:border-gray-300 mt-12">
+  {value.map((member, index) => {
+    return (
+      <Tooltip title={member.emailId} key={index}>
+        <Chip
+          label={member.name}
+          avatar={<Avatar src={member.profilePic} />}
+          className="m-2 text-lg bg-green-100 h-10 transition-all p-1 rounded-full cursor-pointer opacity-55 hover:opacity-75 hover:bg-green-100"
+        />
+      </Tooltip>
+    );
+  })}
+</div>
+
               </form>
             </div>
 
@@ -822,11 +823,10 @@ const grey = {
 };
 
 const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
+  // position: "absolute" as "absolute",
+  // top: "50%",
+  // left: "50%",
+  // transform: "translate(-50%, -50%)",
 };
 
 const ModalContent = styled("div")(
@@ -844,24 +844,30 @@ const ModalContent = styled("div")(
     border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]};
     box-shadow: 0 4px 12px
       ${theme.palette.mode === "dark" ? "rgb(0 0 0 / 0.5)" : "rgb(0 0 0 / 0.2)"};
-    padding: 24px;
+    padding: 16px;
     color: ${theme.palette.mode === "dark" ? grey[50] : grey[900]};
+    
+    /* Mobile first approach */
+    width: 90%; /* Increased from 90% */
+    max-width: 900px;
+    height: auto;
+    max-height: 90vh; /* Increased from 90vh */
+    overflow-y: auto;
 
-    & .modal-title {
-      margin: 0;
-      line-height: 1.5rem;
-      margin-bottom: 8px;
+    /* Tablet breakpoint */
+    @media (min-width: 640px) {
+      width: 85%;
+      padding: 20px;
     }
 
-    & .modal-description {
-      margin: 0;
-      line-height: 1.5rem;
-      font-weight: 400;
-      color: ${theme.palette.mode === "dark" ? grey[400] : grey[800]};
-      margin-bottom: 4px;
+    /* Desktop breakpoint */
+    @media (min-width: 1024px) {
+      width: 75%;
+      padding: 24px;
     }
   `
 );
+
 
 const CustomModalRoot = styled("div")`
   position: fixed;

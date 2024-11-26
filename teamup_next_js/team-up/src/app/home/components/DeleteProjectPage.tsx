@@ -68,13 +68,11 @@ const Project = (props: any) => {
       // console.log('fetch again:',fetchAgain,'projectid:',props.projectId)
       if (fetchAgain && props.projectId) {
         // setTimeout(async() => {
-          const baseURL = process.env.VERCEL_URL 
+        const baseURL = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
+          : "http://localhost:3000";
         const response = await fetch(
-          `/api/project?id=` +
-            props.projectId +
-            "&info=forDeletePage"
+          `/api/project?id=` + props.projectId + "&info=forDeletePage"
         );
         if (response.ok) {
           const responseJson = await response.json();
@@ -104,62 +102,84 @@ const Project = (props: any) => {
     if (props.type === "ownedByYou") {
       if (userEmail === info.owner) {
         return (
-    <div className={`transition-all w-full border-2 h-fit p-0 px-2 mt-1 shadow-sm hover:shadow-md rounded-md ${
-      props.isDarkMode ? 'border-red-400 bg-dark-secondary' : 'border-red-100 bg-white'
-    }`}>
-      <FormControlLabel
-        className="w-full border-none"
-        style={{ width: "40rem" }}
-        control={
-          <Checkbox
-            onClick={handleClick}
+          <div className={`transition-all w-full border-2 p-2 mt-1 shadow-sm hover:shadow-md rounded-md
+      ${props.isDarkMode ? 'border-red-400 bg-dark-secondary' : 'border-red-100 bg-white'}`}>
+      <label className="flex items-center w-full cursor-pointer">
+        <div className="relative flex items-center mr-3">
+          <input
+            type="checkbox"
+            className="hidden"
             checked={checked}
-            style={{ color: props.isDarkMode ? "#f87171" : "darkred" }}
+            onChange={handleClick}
           />
-        }
-        label={
-          <div className="flex flex-row border-red-500 border-none w-full" style={{ width: "41vw" }}>
-            <div className={`w-1/2 border-none overflow-x-hidden ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
-              {info.title}
-            </div>
-            <div className={`w-1/2 text-right overflow-x-hidden ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
-              {info.createdAt}
-            </div>
+          <div className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors
+            ${checked 
+              ? (props.isDarkMode ? 'border-red-400 bg-red-400' : 'border-red-700 bg-red-700')
+              : (props.isDarkMode ? 'border-red-400' : 'border-red-700')
+            }`}
+          >
+            {checked && (
+              <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+            )}
           </div>
-        }
-      />
+        </div>
+        <div className="flex flex-row justify-between w-full text-sm md:text-base">
+          <div className={`truncate flex-1 mr-2
+            ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
+            {info.title}
+          </div>
+          <div className={`whitespace-nowrap flex-shrink-0
+            ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
+            {info.createdAt}
+          </div>
+        </div>
+      </label>
     </div>
-  );
+        );
+      
       } else return <></>;
     } else {
       if (userEmail !== info.owner) {
         return (
-    <div className={`transition-all w-full border-2 h-fit p-0 px-2 mt-1 shadow-sm hover:shadow-md rounded-md ${
-      props.isDarkMode ? 'border-red-400 bg-dark-secondary' : 'border-red-100 bg-white'
-    }`}>
-      <FormControlLabel
-        className="w-full border-none"
-        style={{ width: "40rem" }}
-        control={
-          <Checkbox
-            onClick={handleClick}
+          <div className={`transition-all w-full border-2 p-2 mt-1 shadow-sm hover:shadow-md rounded-md
+      ${props.isDarkMode ? 'border-red-400 bg-dark-secondary' : 'border-red-100 bg-white'}`}>
+      <label className="flex items-center w-full cursor-pointer">
+        <div className="relative flex items-center mr-3">
+          <input
+            type="checkbox"
+            className="hidden"
             checked={checked}
-            style={{ color: props.isDarkMode ? "#f87171" : "darkred" }}
+            onChange={handleClick}
           />
-        }
-        label={
-          <div className="flex flex-row border-red-500 border-none w-full" style={{ width: "41vw" }}>
-            <div className={`w-1/2 border-none overflow-x-hidden ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
-              {info.title}
-            </div>
-            <div className={`w-1/2 text-right overflow-x-hidden ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
-              {info.createdAt}
-            </div>
+          <div className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors
+            ${checked 
+              ? (props.isDarkMode ? 'border-red-400 bg-red-400' : 'border-red-700 bg-red-700')
+              : (props.isDarkMode ? 'border-red-400' : 'border-red-700')
+            }`}
+          >
+            {checked && (
+              <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+            )}
           </div>
-        }
-      />
+        </div>
+        <div className="flex flex-row justify-between w-full text-sm md:text-base">
+          <div className={`truncate flex-1 mr-2
+            ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
+            {info.title}
+          </div>
+          <div className={`whitespace-nowrap flex-shrink-0
+            ${props.isDarkMode ? 'text-dark-text' : 'text-teamuptext'}`}>
+            {info.createdAt}
+          </div>
+        </div>
+      </label>
     </div>
-  );
+        );
+      
       } else return <></>;
     }
     // return (
@@ -268,12 +288,10 @@ function DeleteProjectPage(props: any) {
       // console.log('fetch again:',fetchAgain,'projectid:',props.projectPageId)
       if (fetchAgain && props.projectPageId) {
         // setTimeout(async() => {
-          const baseURL = process.env.VERCEL_URL 
+        const baseURL = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
-        const response = await fetch(
-          `/api/project?id=` + props.projectPageId
-        );
+          : "http://localhost:3000";
+        const response = await fetch(`/api/project?id=` + props.projectPageId);
         if (response.ok) {
           const responseJson = await response.json();
 
@@ -388,7 +406,7 @@ function DeleteProjectPage(props: any) {
       setAwaitSubmit(false);
       return;
     }
-    const baseURL = process.env.VERCEL_URL
+    const baseURL = process.env.VERCEL_URL;
     const url = `/api/create-project`;
     try {
       const response = await fetch(url, {
@@ -471,11 +489,11 @@ function DeleteProjectPage(props: any) {
   const onDelete = async () => {
     if (!toDelete.length) return;
     console.log("projects to delete: ", toDelete);
-    
+
     setAwaitSubmit(true); // Show loading state
-  
+
     try {
-      const baseURL = process.env.VERCEL_URL
+      const baseURL = process.env.VERCEL_URL;
       const response = await fetch(`/api/project`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -485,23 +503,23 @@ function DeleteProjectPage(props: any) {
           userEmail: props.userDetail.emailId,
         }),
       });
-  
+
       if (response.status === 200) {
         // Update local state
         const updatedProjects = props.userDetail.projects.filter(
-          (projectId:any) => !toDelete.includes(projectId)
+          (projectId: any) => !toDelete.includes(projectId)
         );
         props.setUserDetail({
           ...props.userDetail,
           projects: updatedProjects,
         });
-  
+
         // Clear the toDelete array
         setToDelete([]);
-  
+
         // Trigger refresh of home page
         props.setRefreshHomePage(true);
-  
+
         // Show success message
         alert("Projects deleted successfully");
       } else {
@@ -515,12 +533,11 @@ function DeleteProjectPage(props: any) {
       setAwaitSubmit(false); // Hide loading state
     }
   };
-  
 
   const onLeave = async () => {
     if (!toLeave.length) return;
     console.log("projects to leave: ", toLeave);
-    const baseURL = process.env.VERCEL_URL
+    const baseURL = process.env.VERCEL_URL;
     const url = `/api/project`;
     try {
       const response = await fetch(url, {
@@ -564,24 +581,44 @@ function DeleteProjectPage(props: any) {
         closeAfterTransition
       >
         <Fade in={open}>
-        <ModalContent sx={style} className={`w-1/2 h-5/6 ${isDarkMode ? 'bg-dark-bg text-dark-text' : 'bg-white text-teamuptext'}`}>
+          <ModalContent
+            sx={{
+              width: {
+                xs: "95%",
+                sm: "80%",
+                md: "70%",
+                lg: "50%",
+              },
+              maxHeight: {
+                xs: "90vh",
+                sm: "85vh",
+                md: "80vh",
+              },
+              overflow: "auto",
+            }}
+            className={`${
+              isDarkMode
+                ? "bg-dark-bg text-dark-text"
+                : "bg-white text-teamuptext"
+            }`}
+          >
             <div
               id="transition-modal-title"
-              className="modal-title text-left text-3xl font-semibold transition h-fit border-none border-red-500 pt-0 flex flex-row"
+              className="modal-title text-left text-2xl md:text-3xl font-semibold flex flex-row items-center gap-2 p-2"
             >
               {/* {currentPage == 0 ? "New Project" : ""}
               {currentPage == 1 ? "Create Team" : ""} */}
               {/* <div className="my-auto font-semibold h-full flex flex-row border-2 border-red-500"> */}
               <DeleteForeverIcon
-                className="h-8 w-8 my-auto mr-2"
+                className="h-6 w-6 md:h-8 md:w-8"
                 style={{ color: "red" }}
               />
-              <div className="my-auto ">Delete / </div>
+              <div className="my-auto">Delete</div>
               <ExitToAppIcon
-                className="h-8 w-8 my-auto mr-1 ml-2"
+                className="h-6 w-6 md:h-8 md:w-8 ml-2"
                 style={{ color: "red" }}
               />
-              <div className="my-auto ">Leave Projects</div>
+              <div className="my-auto">Leave Projects</div>
               {/* </div> */}
               {/* <button
                 className={
@@ -600,101 +637,82 @@ function DeleteProjectPage(props: any) {
             {/* <span id="transition-modal-description" className="modal-description">
               Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
             </span> */}
-            <div className={`transition-all border-2 border-red-500 border-opacity-10 w-full mx-auto mt-0 overflow-auto modal-content h-full rounded-lg p-1 ${isDarkMode ? 'bg-dark-secondary' : 'bg-red-500 bg-opacity-5'}`}>
-              <div
-                className={
-                  " w-full h-full flex flex-col border-none border-red-500 p-2 pt-0"
-                  //   + (currentPage === "info" ? "" : " hidden")
-                }
-              >
-                <div className={`w-full px-2 h-fit flex flex-row mb-2 border-b-2 border-red-700 border-opacity-30 ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
-                  <div className=" w-1/2 p-1 font-bold">Owned by You</div>
-                  <div className=" w-1/2 text-right p-1 font-bold">
-                    Created at
+            <div
+              className={`transition-all border-2 border-red-500 border-opacity-10 w-full mx-auto overflow-auto rounded-lg p-2
+            ${isDarkMode ? "bg-dark-secondary" : "bg-red-500 bg-opacity-5"}`}
+            >
+              <div className="flex flex-col h-full">
+                {/* Owned Projects Section */}
+                <div className="mb-4">
+                  <div
+                    className={`w-full px-2 flex flex-row justify-between text-sm md:text-base
+                  border-b-2 border-red-700 border-opacity-30 
+                  ${isDarkMode ? "text-red-400" : "text-red-700"}`}
+                  >
+                    <div className="p-1 font-bold">Owned by You</div>
+                    <div className="p-1 font-bold">Created at</div>
+                  </div>
+
+                  <div className="max-h-[30vh] overflow-y-auto">
+                    {props.userDetail.projects.map(
+                      (projectId: any, index: any) => (
+                        <Project
+                          key={index}
+                          {...props}
+                          type="ownedByYou"
+                          projectId={projectId}
+                          func={{
+                            addToDelete,
+                            dontDelete,
+                          }}
+                        />
+                      )
+                    )}
                   </div>
                 </div>
-                {/* <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox defaultChecked />}
-                    label="Label"
-                  />
-                  <FormControlLabel
-                    // required
-                    control={<Checkbox />}
-                    label="Required"
-                  />
-                  <FormControlLabel
-                    disabled
-                    control={<Checkbox />}
-                    label="Disabled"
-                  /> 
-                </FormGroup> */}
-                <div className=" h-1/3 overflow-x-hidden overflow-y-auto">
-                  {props.userDetail.projects.map((projectId: any, index:any) => (
-                    <Project
-                      key={index}
-                      {...props}
-                      type={"ownedByYou"}
-                      projectId={projectId}
-                      func={{
-                        addToDelete: addToDelete,
-                        // addToLeave:addToLeave,
-                        dontDelete: dontDelete,
-                        // dontLeave:dontLeave
-                      }}
-                    />
-                  ))}
-                </div>
-                <div className="h-fit w-full grid">
+                <div className="flex justify-end gap-2 my-2">
                 <button
-      className={`mr-1 ml-auto h-fit p-2 border-2 py-0 rounded-md transition-all hover:border-opacity-75 active:opacity-50 actionbutton ${
-        isDarkMode ? 'border-red-400 text-red-400' : 'border-red-700 text-red-700'
-      }`}
-      onClick={onDelete}
-    >
-      <DeleteForeverIcon
-        className="h-4 w-4 my-auto mr-1"
-        sx={{ color: isDarkMode ? '#f87171' : '#b91c1c' }}
+                  className={`px-3 py-1 rounded-md transition-all flex items-center gap-1
+                    ${isDarkMode ? 'border-red-400 text-red-400' : 'border-red-700 text-red-700'}
+                    hover:opacity-80`}
+                  onClick={onDelete}
+                >
+                  <DeleteForeverIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
+              </div>
+              <div className={`w-full px-2 flex flex-row justify-between text-sm md:text-base
+    border-b-2 border-red-700 border-opacity-30 
+    ${isDarkMode ? 'text-red-400' : 'text-red-700'}`}>
+    <div className="p-1 font-bold">Owned by Others</div>
+    <div className="p-1 font-bold">Created at</div>
+  </div>
+                <div className="max-h-[30vh] overflow-y-auto">
+    {props.userDetail.projects.map((projectId: any, index: any) => (
+      <Project
+        key={index}
+        {...props}
+        type="ownedByOthers"
+        projectId={projectId}
+        func={{
+          addToLeave,
+          dontLeave
+        }}
       />
-      <span className="my-auto"> Delete </span>
-    </button>
-                </div>
-                <div className={`w-full px-2 h-fit flex flex-row mb-2 border-b-2 border-red-700 border-opacity-30 ${isDarkMode ? 'text-red-400' : 'text-red-700'} mt-4`}>
-                  <div className=" w-1/2 p-1 font-bold">Owned by others</div>
-                  <div className=" w-1/2 text-right p-1 font-bold">
-                    Created at
-                  </div>
-                </div>
-                <div className=" h-1/3 overflow-x-hidden overflow-y-auto">
-                  {props.userDetail.projects.map((projectId: any, index:any) => (
-                    <Project
-                      {...props}
-                      key={index}
-                      type={"ownedByOthers"}
-                      projectId={projectId}
-                      func={{
-                        // addToDelete: addToDelete,
-                        addToLeave: addToLeave,
-                        // dontDelete:dontDelete,
-                        dontLeave: dontLeave,
-                      }}
-                    />
-                  ))}
-                </div>
-                <div className="h-fit w-full grid">
-                <button
-      className={`mr-1 ml-auto h-fit p-2 border-2 py-0 rounded-md transition-all hover:border-opacity-75 active:opacity-50 actionbutton ${
-        isDarkMode ? 'border-red-400 text-red-400' : 'border-red-700 text-red-700'
-      }`}
-      onClick={onLeave}
-    >
-      <ExitToAppIcon
-        className="h-4 w-4 my-auto mr-1"
-        sx={{ color: isDarkMode ? '#f87171' : '#b91c1c' }}
-      />
-      <span className="my-auto"> Leave </span>
-    </button>
-                </div>
+    ))}
+  </div>
+{/* </div> */}
+<div className="flex justify-end gap-2 my-2">
+  <button
+    className={`px-3 py-1 rounded-md transition-all flex items-center gap-1
+      ${isDarkMode ? 'border-red-400 text-red-400' : 'border-red-700 text-red-700'}
+      hover:opacity-80`}
+    onClick={onLeave}
+  >
+    <ExitToAppIcon className="h-4 w-4" />
+    <span className="hidden sm:inline">Leave</span>
+  </button>
+</div>
               </div>
               {/* <form action={() => {}} className=" mx-auto my-2 grid w-full">
                 <div className="mx-auto my-2 flex flex-row text-lg w-full">
@@ -1206,7 +1224,7 @@ const Modal = React.forwardRef(function Modal(
     </Portal>
   );
 });
-Modal.displayName = 'Modal';
+Modal.displayName = "Modal";
 
 const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean }>(
   (props, ref) => {
@@ -1218,7 +1236,7 @@ const Backdrop = React.forwardRef<HTMLDivElement, { open?: boolean }>(
     );
   }
 );
-Backdrop.displayName = 'Backdrop';
+Backdrop.displayName = "Backdrop";
 
 const blue = {
   200: "#99CCFF",
@@ -1280,6 +1298,16 @@ const ModalContent = styled("div")(
       font-weight: 400;
       color: ${theme.palette.mode === "dark" ? grey[400] : grey[800]};
       margin-bottom: 4px;
+    }
+
+    @media (max-width: 768px) {
+      width: 90vw !important;
+      padding: 16px;
+      margin: 10px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
     }
   `
 );

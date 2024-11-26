@@ -312,12 +312,31 @@ const Home = () => {
   const [deleteProjectPage, setDeleteProjectPage] = React.useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  useEffect(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    if (savedMode) {
-      setIsDarkMode(JSON.parse(savedMode));
-    }
-  }, []);
+useEffect(() => {
+  // Check for saved preference first
+  const savedMode = localStorage.getItem("darkMode");
+  
+  if (savedMode !== null) {
+    setIsDarkMode(JSON.parse(savedMode));
+  } else {
+    // If no saved preference, check system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDark);
+    localStorage.setItem("darkMode", JSON.stringify(prefersDark));
+  }
+
+  // Add listener for system theme changes
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const handleChange = (e: MediaQueryListEvent) => {
+    const newMode = e.matches;
+    setIsDarkMode(newMode);
+    localStorage.setItem("darkMode", JSON.stringify(newMode));
+  };
+
+  mediaQuery.addEventListener('change', handleChange);
+  
+  return () => mediaQuery.removeEventListener('change', handleChange);
+}, []);
 
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
@@ -333,19 +352,51 @@ const Home = () => {
     >
       {/* Loading screen */}
       <div
-        className={`h-screen w-full flex items-center justify-center ${
-          userInfo.name && userInfo.emailId ? "hidden" : ""
-        }`}
-      >
-        <div className="text-center">
-          <img
-            src={logo.src}
-            className="w-32 md:w-48 mx-auto mb-4"
-            alt="Team Up Logo"
+  className={`h-screen w-full flex items-center justify-center ${
+    userInfo.name && userInfo.emailId ? "hidden" : ""
+  } ${
+    isDarkMode ? "bg-dark-bg" : "bg-teamupbg"
+  }`}
+>
+  <div className="text-center">
+    <img
+      src={logo.src}
+      className="w-32 md:w-48 mx-auto mb-8 animate-pulse"
+      alt="Team Up Logo"
+    />
+    <div className="flex flex-col items-center">
+      <div className={`w-12 h-12 mb-4 ${
+        isDarkMode ? "text-dark-text" : "text-teamuptext"
+      }`}>
+        <svg 
+          className="animate-spin" 
+          viewBox="0 0 24 24"
+        >
+          <circle 
+            className="opacity-25" 
+            cx="12" 
+            cy="12" 
+            r="10" 
+            stroke="currentColor" 
+            strokeWidth="4"
+            fill="none"
           />
-          <p className="text-xl font-semibold">Loading...</p>
-        </div>
+          <path 
+            className="opacity-75" 
+            fill="currentColor" 
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
       </div>
+      {/* <p className={`text-xl font-semibold animate-pulse ${
+        isDarkMode ? "text-dark-text" : "text-teamuptext"
+      }`}>
+        Loading...
+      </p> */}
+    </div>
+  </div>
+</div>
+
 
       {/* Main content */}
       <div
@@ -370,27 +421,41 @@ const Home = () => {
           }`}
         >
           <header className="flex justify-between items-center p-4">
-            <h1 className="text-3xl md:text-4xl font-semibold">Team Up</h1>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 rounded-full ${
-                  isDarkMode
-                    ? "bg-yellow-400 text-dark-bg"
-                    : "bg-gray-800 text-teamupbg"
-                }`}
-              >
-                {isDarkMode ? "☀️" : "🌙"}
-              </button>
-              <Profile
-                userInfo={{
-                  name: userInfo.name,
-                  profilePic: userInfo.profilePic,
-                }}
-                isDarkMode={isDarkMode}
-              />
-            </div>
-          </header>
+  <h1 className="text-3xl md:text-4xl font-semibold ml-auto mr-10">Team Up</h1>
+  <div className="flex items-center">
+  <button
+    onClick={toggleDarkMode}
+    className="relative inline-flex h-6 w-11 items-center rounded-full mx-3"
+    role="switch"
+    aria-checked={isDarkMode}
+  >
+    <span className="sr-only">Toggle dark mode</span>
+    <div
+      className={`absolute w-full h-full rounded-full transition ${
+        isDarkMode ? 'bg-blue-600' : 'bg-gray-200'
+      }`}
+    />
+    <div
+      className={`${
+        isDarkMode ? 'translate-x-6' : 'translate-x-1'
+      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+    >
+      <span className="absolute inset-0 flex items-center justify-center text-xs">
+        {isDarkMode ? '🌙' : '☀️'}
+      </span>
+    </div>
+  </button>
+  <Profile
+    userInfo={{
+      name: userInfo.name,
+      profilePic: userInfo.profilePic,
+    }}
+    isDarkMode={isDarkMode}
+  />
+</div>
+
+</header>
+
           <main className="flex-grow overflow-hidden flex flex-col p-0">
   <div className="overflow-y-hidden mb-0">
     <ProjectPane
@@ -440,6 +505,7 @@ const Home = () => {
           projectPageId={projectPageId}
           deleteProjectPage={deleteProjectPage}
           isDarkMode={isDarkMode}
+          setUserDetail={setUserInfo}
         />
       )}
     </div>
