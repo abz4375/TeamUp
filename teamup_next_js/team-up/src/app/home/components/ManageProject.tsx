@@ -15,7 +15,7 @@ import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import CreateTask from "./ManageProject/CreateTask";
 import Contributor from "./ManageProject/Contributor";
-import Task from './Task';
+import Task from "./Task";
 
 interface Props {
   userDetail: {
@@ -54,10 +54,8 @@ function ManageProject(props: Props) {
   React.useEffect(() => {
     const fetchData = async () => {
       if (fetchAgain && props.projectPageId) {
-        const baseURL = process.env.VERCEL_URL
-        const response = await fetch(
-          `/api/project?id=` + props.projectPageId
-        );
+        const baseURL = process.env.VERCEL_URL;
+        const response = await fetch(`/api/project?id=` + props.projectPageId);
         if (response.ok) {
           const responseJson = await response.json();
 
@@ -80,7 +78,9 @@ function ManageProject(props: Props) {
   React.useEffect(() => {
     const fetchProjectTasks = async () => {
       try {
-        const response = await fetch(`/api/task?projectId=${props.projectPageId}`);
+        const response = await fetch(
+          `/api/task?projectId=${props.projectPageId}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -91,7 +91,7 @@ function ManageProject(props: Props) {
         console.error("Error fetching tasks:", error);
       }
     };
-  
+
     if (props.projectPageId) {
       fetchProjectTasks();
     }
@@ -105,9 +105,7 @@ function ManageProject(props: Props) {
     props.setProjectToggle(false);
   };
 
-  const [value, setValue] = React.useState<any[]>([
-    
-  ]);
+  const [value, setValue] = React.useState<any[]>([]);
 
   const handleCreateTask = async (taskData: any) => {
     console.log("Creating task:", taskData);
@@ -174,41 +172,48 @@ function ManageProject(props: Props) {
         closeAfterTransition
       >
         <Fade in={open}>
-          <ModalContent
-            sx={style}
-            className={`overflow-auto overflow-x-hidden
-              ${props.isDarkMode ? "bg-dark-bg text-dark-text" : "bg-white text-black"}
-              w-full md:w-4/5 lg:w-3/4 xl:w-2/3  // Responsive widths
-              h-[95vh] md:h-4/5                   // Responsive heights
-              p-2 md:p-4 lg:p-6                   // Responsive padding
-            `}
-            isDarkMode={props.isDarkMode}
-          >
+        <ModalContent
+  sx={style}
+  className={`
+    overflow-auto overflow-x-hidden
+    ${props.isDarkMode ? "bg-dark-bg text-dark-text" : "bg-white text-black"}
+    w-[90%] md:w-11/12 lg:w-4/5 xl:w-3/4  
+    h-[90vh] md:h-[90vh] lg:h-[85vh]
+    p-2 md:p-4 lg:p-6
+    mx-auto
+    flex flex-col
+    rounded-lg
+  `}
+  isDarkMode={props.isDarkMode}
+>
+
             <div
-              id="transition-modal-title"
-              className={`modal-title text-left text-3xl font-extralight transition h-fit border-none pt-0 flex flex-row ${
-                props.isDarkMode ? "text-dark-text" : "text-black"
-              }`}
-            >
-              <span className="my-auto font-semibold">{info?.title}</span>
-              <button
-                className={
-                  "w-full h-full flex flex-col md:flex-row ml-4 text-lg p-1 border-2 rounded-md my-auto hover:border-blue-500 transition-all" +
-                  (currentPage === "info" && !props.isDarkMode
-                    ? " bg-blue-50 border-blue-500"
-                    : "bg-blue-900 border-blue-500") +
-                  "hover:" +
-                  (props.isDarkMode ? "bg-blue-900" : "bg-blue-50")
-                }
-                onClick={() => {
-                  if (currentPage !== "info") setCurrentPage("info");
-                  else setCurrentPage("tasks");
-                }}
-              >
-                <InfoIcon className=" h-full" style={{ color: blue[500] }} />
-                <span className="my-auto m-2 text-blue-500"> Info </span>
-              </button>
-            </div>
+  id="transition-modal-title"
+  className={`modal-title text-left text-2xl md:text-3xl flex flex-row items-center gap-4 p-2 ${
+    props.isDarkMode ? "text-dark-text" : "text-black"
+  }`}
+>
+  <span className="font-semibold truncate flex-1">{info?.title}</span>
+  <button
+    className={`flex items-center px-3 py-1 text-sm md:text-base border-2 rounded-md transition-all ${
+      currentPage === "info" 
+        ? props.isDarkMode
+          ? "bg-blue-900 border-blue-500" 
+          : "bg-blue-50 border-blue-500"
+        : props.isDarkMode
+          ? "hover:bg-blue-900 border-blue-400"
+          : "hover:bg-blue-50 border-blue-400"
+    }`}
+    onClick={() => {
+      if (currentPage !== "info") setCurrentPage("info");
+      else setCurrentPage("tasks");
+    }}
+  >
+    <InfoIcon className="h-4 w-4 md:h-5 md:w-5" style={{ color: blue[500] }} />
+    <span className="ml-2 text-blue-500">Info</span>
+  </button>
+</div>
+
             <div
               className={
                 currentPage === "info"
@@ -222,16 +227,23 @@ function ManageProject(props: Props) {
             >
               <div
                 className={
-                  "w-full h-full flex flex-row " +
+                  "w-full h-full flex flex-col md:flex-row " +
                   (currentPage === "info" ? "" : " hidden")
                 }
               >
                 <div
-                  className={` w-2/3 border-2 border-blue-500 border-opacity-10 rounded-md m-1  p-4 text-lg flex flex-col overflow-auto border-none ${
-                    props.isDarkMode
-                      ? "text-dark-text bg-dark-bg-secondary bg-opacity-100"
-                      : "text-black"
-                  }`}
+                  className={`
+      w-full md:w-2/3 
+      border-2 border-blue-500 border-opacity-10 
+      rounded-md m-1 p-2 md:p-4 
+      text-base md:text-lg 
+      flex flex-col overflow-auto border-none
+      ${
+        props.isDarkMode
+          ? "text-dark-text bg-dark-bg-secondary bg-opacity-100"
+          : "text-black"
+      }
+    `}
                 >
                   <Markdown
                     remarkPlugins={[remarkGfm]}
@@ -267,11 +279,17 @@ function ManageProject(props: Props) {
                   />
                 </div>
                 <div
-                  className={`w-1/3 border-2 rounded-md m-1 flex flex-col overflow-hidden ${
-                    props.isDarkMode
-                      ? "bg-dark-bg-secondary border-white border-opacity-25"
-                      : "bg-gray-50 border-gray-600 border-opacity-15"
-                  }`}
+                  className={`
+      w-full md:w-1/3
+      mt-4 md:mt-0
+      border-2 rounded-md m-1 
+      flex flex-col overflow-hidden
+      ${
+        props.isDarkMode
+          ? "bg-dark-bg-secondary border-white border-opacity-25"
+          : "bg-gray-50 border-gray-600 border-opacity-15"
+      }
+    `}
                 >
                   <span
                     className={`mt-0 w-full px-4 py-2 font-light text-xl h-fit text-center border-b-2  ${
@@ -300,46 +318,45 @@ function ManageProject(props: Props) {
                 id="transition-modal-title"
                 className="modal-title text-left text-2xl font-extralight transition h-fit border-none border-red-500 pt-4 flex flex-row pl-0"
               >
-                <span
-                  className={`my-auto font-sans ml-4 w-fit px-5 py-2 rounded-md font-normal border-b-2 ${
-                    props.isDarkMode
-                      ? "text-blue-300 bg-blue-900 border-blue-300"
-                      : "text-blue-900 bg-blue-100 border-blue-900"
-                  }`}
-                >
+                <span className={`
+      text-xl md:text-2xl 
+      font-sans w-full md:w-auto 
+      px-3 md:px-5 py-2
+      rounded-md font-normal border-b-2
+      mb-4 md:mb-0
+      text-center md:text-left mx-4
+      ${props.isDarkMode
+        ? "text-blue-300 bg-blue-900 border-blue-300"
+        : "text-blue-900 bg-blue-100 border-blue-900"
+      }
+    `}>
                   {" "}
                   🎯&nbsp; Manage Tasks
                 </span>
 
-                <div
-                  className={
-                    "flex flex-row h-fit w-fit ml-auto mr-4 mt-0 mb-1 border-none bg-gray-0 p-2 rounded-lg pl-0 pr-4 shadow-sm" +
-                    (info.maintainers.indexOf(props.userDetail.emailId) === -1
-                      ? " hidden"
-                      : "")
-                  }
-                 >
-                  <button
-                    className={`hover:bg-blue-500 ml-4 mr-2 w-fit h-fit px-2 py-2 rounded-full transition flex flex-row my-auto ${
-                      props.isDarkMode
-                        ? "bg-blue-700 text-blue-100 active:bg-blue-800"
-                        : "bg-blue-400 text-white active:bg-blue-600"
-                    }`}
-                    onClick={() => {
-                      if (!createTask) setCreateTask(true);
-                      else setCreateTask(false);
-                    }}
-                  >
-                    <AddTaskIcon className="w-5 h-5" />
-                  </button>
-                  <div
-                    className={`border-none h-fit my-auto text-lg font-normal font-sans ${
-                      props.isDarkMode ? "text-blue-300" : "text-blue-500"
-                    }`}
-                  >
-                    Create Task
-                  </div>
-                </div>
+                <div className={`
+  flex flex-row h-fit 
+  ml-auto mr-4 mt-0 mb-1
+  max-w-[200px] // Added max width
+  ${info.maintainers.indexOf(props.userDetail.emailId) === -1 ? "hidden" : ""}
+`}>
+  <button
+    className={`flex items-center gap-2 px-3 py-2 rounded-md transition h-11 ${
+      props.isDarkMode
+        ? "bg-blue-700 text-blue-100 hover:bg-blue-600 active:bg-blue-800"
+        : "bg-blue-400 text-white hover:bg-blue-500 active:bg-blue-600"
+    }`}
+    onClick={() => {
+      setCreateTask(!createTask);
+    }}
+  >
+    <AddTaskIcon className="w-5 h-5" />
+    <span className="hidden md:inline text-sm">Create Task</span>
+  </button>
+
+</div>
+
+
               </div>
               <div className=" h-full mt-0 border-none">
                 <div
@@ -360,32 +377,36 @@ function ManageProject(props: Props) {
                       setFetchAgain={setFetchAgain}
                       value={value}
                       setValue={setValue}
-                      onTaskCreated={handleTaskCreated} 
+                      onTaskCreated={handleTaskCreated}
                       fetchAgain={fetchAgain}
                       setEmptyList={setEmptyList}
                       setUsers={setUsers}
                       projectName={info?.title}
                       projectId={props.projectPageId}
-                      projectMembers={[info.owner, ...info.maintainers, ...info.contributors]}
+                      projectMembers={[
+                        info.owner,
+                        ...info.maintainers,
+                        ...info.contributors,
+                      ]}
                     />
                   )}
                 </div>
-                {currentPage === "tasks" && (
-                <>
-                  {/* Your existing Manage Task content */}
-                  
-                  {/* Add the task list */}
-                  <div className="task-list">
-                    {projectTasks.map((task) => (
-                      <Task 
-                        key={task.id}
-                        fetchID={task.id}
-                        isDarkMode={isDarkMode}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
+                {currentPage && (
+                  <>
+                    {/* Your existing Manage Task content */}
+
+                    {/* Add the task list */}
+                    <div className="task-list">
+                      {projectTasks.map((task) => (
+                        <Task
+                          key={task.id}
+                          fetchID={task.id}
+                          isDarkMode={isDarkMode}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </ModalContent>
@@ -555,18 +576,25 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: {
-    xs: '95%', // Full width on mobile with small margins
-    sm: '80%', // Slightly smaller on tablets
-    md: '70%', // Medium screens
-    lg: '60%', // Desktop
-    xl: '50%'  // Large screens
+    xs: '95%',    // Mobile
+    sm: '90%',    // Small tablets
+    md: '85%',    // Tablets
+    lg: '80%',    // Small desktop
+    xl: '75%'     // Large desktop
   },
   maxHeight: {
-    xs: '95vh', // Almost full height on mobile
-    sm: '90vh', // Slightly smaller on tablets
-    md: '85vh'  // Comfortable height on larger screens
+    xs: '95vh',   // Mobile
+    sm: '90vh',   // Tablets
+    md: '85vh',   // Desktop
+    xl: '80vh'    // Large screens
+  },
+  margin: {
+    xs: '10px',   // Mobile
+    sm: '20px',   // Tablets
+    md: '30px'    // Desktop
   }
 };
+
 interface ModalContentProps {
   isDarkMode: boolean;
 }

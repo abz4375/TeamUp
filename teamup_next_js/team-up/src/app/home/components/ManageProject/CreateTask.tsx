@@ -153,22 +153,23 @@ React.useEffect(() => {
 
   return (
     <div
-      className={`w-full h-fit flex flex-col md:flex-row shadow-sm ${
-        isDarkMode ? "bg-dark-bg-secondary" : "bg-white"
-      }`}
-    >
+  className={`w-full h-fit flex flex-col md:flex-row shadow-sm p-2 md:p-4 gap-4 ${
+    isDarkMode ? "bg-dark-bg-secondary" : "bg-white"
+  }`}
+>
       {/* Left section - Task Description and Assignees */}
-      <div className="w-full md:w-2/3 m-1">
-        <textarea
-          className={`w-full border-2 rounded-md p-2 md:p-4 text-lg md:text-2xl flex flex-col overflow-auto resize-none h-48 md:h-60 ${
-            isDarkMode
-              ? "bg-gray-800 text-dark-text border-dark-border"
-              : "bg-white text-black border-blue-900 border-opacity-10"
-          }`}
-          placeholder="Task Description..."
-          value={taskDescription}
-          onChange={(e) => setTaskDescription(e.target.value)}
-        ></textarea>
+      <div className="w-full md:w-2/3 flex flex-col gap-3">
+      <textarea
+      className={`w-full border-2 rounded-md p-2 md:p-4 text-base md:text-lg flex flex-col 
+        overflow-auto resize-none h-40 md:h-60 ${
+        isDarkMode
+          ? "bg-gray-800 text-dark-text border-dark-border"
+          : "bg-white text-black border-blue-900 border-opacity-10"
+      }`}
+      placeholder="Task Description..."
+      value={taskDescription}
+      onChange={(e) => setTaskDescription(e.target.value)}
+    />
         <form action={() => {}} className="mx-auto grid w-full h-auto md:h-20 mt-3">
           <div
             className={`mx-auto flex flex-row text-base md:text-lg w-full h-full border-none rounded-md ${
@@ -176,43 +177,38 @@ React.useEffect(() => {
             }`}
           >
   <Autocomplete
-    className="ml-2 mr-auto my-auto w-full"
+    className="ml-2 mr-auto my-auto"
     sx={(theme) => ({
-      width: {
-        xs: "90vw",
-        sm: "85vw",
-        md: "80vw",
-        lg: "600px"
-      },
+      width: '100%',
       "& .MuiInputBase-root": {
-        color: isDarkMode
-          ? theme.palette.grey[100]
-          : theme.palette.grey[900],
-        backgroundColor: isDarkMode
-          ? theme.palette.grey[800]
-          : theme.palette.background.paper,
+        color: isDarkMode ? theme.palette.grey[100] : theme.palette.grey[900],
+        backgroundColor: isDarkMode ? theme.palette.grey[800] : theme.palette.background.paper,
+        fontSize: {
+          xs: '0.875rem',
+          sm: '0.925rem',
+          md: '1rem'
+        }
       },
       "& .MuiOutlinedInput-notchedOutline": {
-        borderColor: isDarkMode
-          ? theme.palette.grey[700]
-          : theme.palette.grey[300],
+        borderColor: isDarkMode ? theme.palette.grey[700] : theme.palette.grey[300],
       },
       "& .MuiInputLabel-root": {
-        color: isDarkMode
-          ? theme.palette.grey[400]
-          : theme.palette.grey[600],
+        color: isDarkMode ? theme.palette.grey[400] : theme.palette.grey[600],
+        fontSize: {
+          xs: '0.875rem',
+          sm: '0.925rem',
+          md: '1rem'
+        }
       },
-      "& .MuiAutocomplete-popupIndicator": {
-        color: isDarkMode
-          ? theme.palette.grey[400]
-          : theme.palette.grey[600],
-      },
-      "& .MuiAutocomplete-clearIndicator": {
-        color: isDarkMode
-          ? theme.palette.grey[400]
-          : theme.palette.grey[600],
-      },
+      "& .MuiChip-root": {
+        fontSize: {
+          xs: '0.75rem',
+          sm: '0.8rem',
+          md: '0.875rem'
+        }
+      }
     })}
+    // style={{width: '100px'}}
     multiple
     id="fixed-tags-demo"
     value={value}
@@ -231,35 +227,40 @@ React.useEffect(() => {
       option.emailId ? (
         <li
           {...props}
-          className={`m-2 p-1 rounded-lg transition flex flex-row cursor-pointer ${
-            isDarkMode
+          className={`p-2 rounded-lg transition flex items-center gap-2 cursor-pointer
+            ${isDarkMode
               ? "hover:bg-gray-700 text-gray-200"
               : "hover:bg-gray-100 text-gray-900"
-          }`}
+            }`}
+          style={{
+            minWidth: '200px',
+            maxWidth: '100%'
+          }}
         >
-          <Avatar src={option.profilePic ?? ""} className="mr-3" />
-          <div className="flex flex-col">
-            <span
-              className={
-                isDarkMode ? "text-gray-200" : "text-gray-900"
+          <Avatar 
+            src={option.profilePic ?? ""} 
+            sx={{ 
+              width: {
+                xs: 20,
+                sm: 24
+              },
+              height: {
+                xs: 20,
+                sm: 24
               }
-            >
+            }}
+          />
+          <div className="flex flex-col flex-1 min-w-0">
+            <span className="truncate text-xs sm:text-sm font-medium">
               {option.name ?? ""}
             </span>
-            <span
-              style={{ fontSize: "smaller" }}
-              className={
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }
-            >
+            <span className="truncate text-xs opacity-75">
               {option.emailId ?? ""}
             </span>
           </div>
         </li>
       ) : (
-        <div
-          className={isDarkMode ? "text-gray-400" : "text-gray-500"}
-        >
+        <div className="p-2 text-center text-xs sm:text-sm opacity-75">
           search...
         </div>
       )
@@ -271,8 +272,8 @@ React.useEffect(() => {
             label={option.name}
             avatar={<Avatar src={option.profilePic} />}
             {...getTagProps({ index })}
-            // disabled={option.emailId === userDetail.emailId}
-            className={`m-1 transition-all ${
+            size="small"
+            className={`m-0.5 ${
               isDarkMode
                 ? "bg-gray-700 text-gray-200"
                 : "bg-blue-100 text-blue-800"
@@ -281,7 +282,7 @@ React.useEffect(() => {
         </Tooltip>
       ))
     }
-    style={{ width: 600 }}
+    style={{ width: "100%" }}
     renderInput={(params) => (
       <TextField
         {...params}
@@ -292,13 +293,7 @@ React.useEffect(() => {
           setFetchAgain(true);
         }}
         value={userSearchTerm}
-        InputProps={{
-          ...params.InputProps,
-          style: { color: isDarkMode ? "#E5E7EB" : undefined },
-        }}
-        InputLabelProps={{
-          style: { color: isDarkMode ? "#9CA3AF" : undefined },
-        }}
+        size="small"
       />
     )}
     noOptionsText={
