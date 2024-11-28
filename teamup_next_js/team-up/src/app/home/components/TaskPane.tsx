@@ -5,9 +5,10 @@ import "./taskpane.css";
 interface TaskPaneProps {
   tasks: any[];
   isDarkMode: boolean;
+  currentUserEmail: string;
 }
 
-export default function TaskPane({ tasks, isDarkMode }: TaskPaneProps) {
+export default function TaskPane({ tasks, isDarkMode, currentUserEmail }: TaskPaneProps) {
   return (
     <div className={`ml-5 mt-2 mr-1 w-full h-full pt-2 pb-4 paperTask border-2 ${
       isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-300 bg-gray-50'
@@ -21,6 +22,7 @@ export default function TaskPane({ tasks, isDarkMode }: TaskPaneProps) {
         {tasks && tasks.length > 0 ? (
           tasks.map((task, index) => (
             <Task 
+              currentUserEmail={currentUserEmail}
               key={task._id || index} 
               fetchID={task} 
               isDarkMode={isDarkMode}

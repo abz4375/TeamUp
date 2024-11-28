@@ -245,7 +245,7 @@ const Home = () => {
               className="h-72 flex-grow flex-shrink-0 mr-8"
               style={{ marginLeft: "-8px" }}
             >
-              <TaskPane tasks={userInfo.tasks} isDarkMode={isDarkMode} />
+              <TaskPane currentUserEmail={userInfo.emailId} tasks={userInfo.tasks} isDarkMode={isDarkMode} />
             </div>
           </main>
         </div>
@@ -389,7 +389,7 @@ const Home = () => {
                 className={`flex-1 rounded-lg shadow-sm overflow-hidden
                 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
               >
-                <TaskPane tasks={userInfo.tasks} isDarkMode={isDarkMode} />
+                <TaskPane currentUserEmail={userInfo.emailId} tasks={userInfo.tasks} isDarkMode={isDarkMode} />
               </div>
             </section>
           </main>
