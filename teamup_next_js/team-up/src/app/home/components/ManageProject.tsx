@@ -11,7 +11,11 @@ import InfoIcon from "@mui/icons-material/Info";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { twilight, vs, vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  twilight,
+  vs,
+  vscDarkPlus,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import CreateTask from "./ManageProject/CreateTask";
 import Contributor from "./ManageProject/Contributor";
@@ -38,6 +42,42 @@ function ManageProject(props: Props) {
   const [fetchAgain, setFetchAgain] = React.useState(props.projectToggle);
   const [projectTasks, setProjectTasks] = React.useState<any[]>([]);
   const isDarkMode = props.isDarkMode;
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editedDescription, setEditedDescription] = React.useState("");
+  const [showPreview, setShowPreview] = React.useState(true);
+
+  const handleEditClick = () => {
+    setEditedDescription(info?.description || "");
+    // Set showPreview first, then isEditing
+    setShowPreview(false);
+    setIsEditing(true);
+  };
+
+  const handleSaveDescription = async () => {
+    try {
+      const response = await fetch(`/api/project`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectId: props.projectPageId,
+          description: editedDescription,
+        }),
+      });
+  
+      if (response.ok) {
+        setInfo({ ...info, description: editedDescription });
+        // Set isEditing first, then showPreview
+        setIsEditing(false);
+        setShowPreview(true);
+      } else {
+        console.error('Failed to update description');
+      }
+    } catch (error) {
+      console.error('Error updating description:', error);
+    }
+  };
 
   const [info, setInfo] = React.useState({
     title: "",
@@ -172,9 +212,9 @@ function ManageProject(props: Props) {
         closeAfterTransition
       >
         <Fade in={open}>
-        <ModalContent
-  sx={style}
-  className={`
+          <ModalContent
+            sx={style}
+            className={`
     overflow-auto overflow-x-hidden
     ${props.isDarkMode ? "bg-dark-bg text-dark-text" : "bg-white text-black"}
     w-[90%] md:w-11/12 lg:w-4/5 xl:w-3/4  
@@ -184,35 +224,39 @@ function ManageProject(props: Props) {
     flex flex-col
     rounded-lg
   `}
-  isDarkMode={props.isDarkMode}
->
-
+            isDarkMode={props.isDarkMode}
+          >
             <div
-  id="transition-modal-title"
-  className={`modal-title text-left text-2xl md:text-3xl flex flex-row items-center gap-4 p-2 ${
-    props.isDarkMode ? "text-dark-text" : "text-black"
-  }`}
->
-  <span className="font-semibold truncate flex-1">{info?.title}</span>
-  <button
-    className={`flex items-center px-3 py-1 text-sm md:text-base border-2 rounded-md transition-all ${
-      currentPage === "info" 
-        ? props.isDarkMode
-          ? "bg-blue-900 border-blue-500" 
-          : "bg-blue-50 border-blue-500"
-        : props.isDarkMode
-          ? "hover:bg-blue-900 border-blue-400"
-          : "hover:bg-blue-50 border-blue-400"
-    }`}
-    onClick={() => {
-      if (currentPage !== "info") setCurrentPage("info");
-      else setCurrentPage("tasks");
-    }}
-  >
-    <InfoIcon className="h-4 w-4 md:h-5 md:w-5" style={{ color: blue[500] }} />
-    <span className="ml-2 text-blue-500">Info</span>
-  </button>
-</div>
+              id="transition-modal-title"
+              className={`modal-title text-left text-2xl md:text-3xl flex flex-row items-center gap-4 p-2 ${
+                props.isDarkMode ? "text-dark-text" : "text-black"
+              }`}
+            >
+              <span className="font-semibold truncate flex-1">
+                {info?.title}
+              </span>
+              <button
+                className={`flex items-center px-3 py-1 text-sm md:text-base border-2 rounded-md transition-all ${
+                  currentPage === "info"
+                    ? props.isDarkMode
+                      ? "bg-blue-900 border-blue-500"
+                      : "bg-blue-50 border-blue-500"
+                    : props.isDarkMode
+                    ? "hover:bg-blue-900 border-blue-400"
+                    : "hover:bg-blue-50 border-blue-400"
+                }`}
+                onClick={() => {
+                  if (currentPage !== "info") setCurrentPage("info");
+                  else setCurrentPage("tasks");
+                }}
+              >
+                <InfoIcon
+                  className="h-4 w-4 md:h-5 md:w-5"
+                  style={{ color: blue[500] }}
+                />
+                <span className="ml-2 text-blue-500">Info</span>
+              </button>
+            </div>
 
             <div
               className={
@@ -231,7 +275,7 @@ function ManageProject(props: Props) {
                   (currentPage === "info" ? "" : " hidden")
                 }
               >
-                <div
+                {/* <div
                   className={`
       w-full md:w-2/3 
       border-2 border-blue-500 border-opacity-10 
@@ -277,7 +321,116 @@ function ManageProject(props: Props) {
                       },
                     }}
                   />
+                </div> */}
+                <div
+                  className={`
+  w-full md:w-2/3 
+  border-2 border-blue-500 border-opacity-10 
+  rounded-md m-1 p-2 md:p-4 
+  text-base md:text-lg 
+  flex flex-col overflow-auto border-none
+  ${
+    props.isDarkMode
+      ? "text-dark-text bg-dark-bg-secondary bg-opacity-100"
+      : "text-black"
+  }
+`}
+                >
+                  {/* Add edit button for maintainers */}
+                  {info.maintainers.indexOf(props.userDetail.emailId) !==
+                    -1 && (
+                    <div className="flex justify-end mb-2 gap-2">
+                      {isEditing ? (
+                        <>
+                          <button
+                            className={`px-3 py-1 rounded-md text-sm transition ${
+                              props.isDarkMode
+                                ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            }`}
+                            onClick={() => setShowPreview(!showPreview)}
+                          >
+                            {showPreview ? "Edit" : "Preview"}
+                          </button>
+                          <button
+                            className={`px-3 py-1 rounded-md text-sm transition ${
+                              props.isDarkMode
+                                ? "bg-green-700 text-green-100 hover:bg-green-600"
+                                : "bg-green-600 text-white hover:bg-green-700"
+                            }`}
+                            onClick={handleSaveDescription}
+                          >
+                            Save
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className={`px-3 py-1 rounded-md text-sm transition ${
+                            props.isDarkMode
+                              ? "bg-blue-700 text-blue-100 hover:bg-blue-600"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          }`}
+                          onClick={() => {
+                            setIsEditing(true);
+                            setEditedDescription(info?.description);
+                            setShowPreview(false);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Show either editor or preview */}
+                  {isEditing && !showPreview ? (
+                    <textarea
+                      value={editedDescription}
+                      onChange={(e) => setEditedDescription(e.target.value)}
+                      className={`w-full h-full min-h-[300px] p-4 rounded-md border-2 font-mono text-sm ${
+                        props.isDarkMode
+                          ? "bg-gray-800 text-gray-200 border-gray-700"
+                          : "bg-white text-gray-900 border-gray-300"
+                      }`}
+                    />
+                  ) : (
+                    <Markdown
+                      remarkPlugins={[remarkGfm]}
+                      children={
+                        isEditing ? editedDescription : info?.description
+                      }
+                      components={{
+                        code(props) {
+                          const { children, className, node, ...rest } = props;
+                          const match = /language-(\w+)/.exec(className || "");
+                          return match ? (
+                            <SyntaxHighlighter
+                              {...rest}
+                              PreTag="div"
+                              children={String(children).replace(/\n$/, "")}
+                              language={match[1]}
+                              style={vscDarkPlus}
+                              ref={null}
+                            />
+                          ) : (
+                            <div
+                              {...rest}
+                              className={
+                                isDarkMode
+                                  ? "bg-gray-700 rounded-md px-1 font-mono w-fit inline-block"
+                                  : "bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
+                              }
+                              ref={null}
+                            >
+                              {children}
+                            </div>
+                          );
+                        },
+                      }}
+                    />
+                  )}
                 </div>
+
                 <div
                   className={`
       w-full md:w-1/3
@@ -318,45 +471,48 @@ function ManageProject(props: Props) {
                 id="transition-modal-title"
                 className="modal-title text-left text-2xl font-extralight transition h-fit border-none border-red-500 pt-4 flex flex-row pl-0"
               >
-                <span className={`
-      text-xl md:text-2xl 
-      font-sans w-full md:w-auto 
-      px-3 md:px-5 py-2
-      rounded-md font-normal border-b-2
-      mb-4 md:mb-0
-      text-center md:text-left mx-4
-      ${props.isDarkMode
-        ? "text-blue-300 bg-blue-900 border-blue-300"
-        : "text-blue-900 bg-blue-100 border-blue-900"
-      }
-    `}>
-                  {" "}
+                <span
+                  className={`
+                              text-xl md:text-2xl 
+                              font-sans w-full md:w-auto 
+                              px-3 md:px-5 py-2
+                              rounded-md font-normal border-b-2
+                              mb-4 md:mb-0
+                              text-center md:text-left mx-4
+                              ${
+                                props.isDarkMode
+                                  ? "text-blue-300 bg-blue-900 border-blue-300"
+                                  : "text-blue-900 bg-blue-100 border-blue-900"
+                              }
+                            `}
+                >
                   🎯&nbsp; Manage Tasks
                 </span>
 
-                <div className={`
+                <div
+                  className={`
   flex flex-row h-fit 
   ml-auto mr-4 mt-0 mb-1
   max-w-[200px] // Added max width
   ${info.maintainers.indexOf(props.userDetail.emailId) === -1 ? "hidden" : ""}
-`}>
-  <button
-    className={`flex items-center gap-2 px-3 py-2 rounded-md transition h-11 ${
-      props.isDarkMode
-        ? "bg-blue-700 text-blue-100 hover:bg-blue-600 active:bg-blue-800"
-        : "bg-blue-400 text-white hover:bg-blue-500 active:bg-blue-600"
-    }`}
-    onClick={() => {
-      setCreateTask(!createTask);
-    }}
-  >
-    <AddTaskIcon className="w-5 h-5" />
-    <span className="hidden md:inline text-sm">Create Task</span>
-  </button>
-
-</div>
-
-
+`}
+                >
+                  <button
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md transition h-11 ${
+                      props.isDarkMode
+                        ? "bg-blue-700 text-blue-100 hover:bg-blue-600 active:bg-blue-800"
+                        : "bg-blue-400 text-white hover:bg-blue-500 active:bg-blue-600"
+                    }`}
+                    onClick={() => {
+                      setCreateTask(!createTask);
+                    }}
+                  >
+                    <AddTaskIcon className="w-5 h-5" />
+                    <span className="hidden md:inline text-sm">
+                      Create Task
+                    </span>
+                  </button>
+                </div>
               </div>
               <div className=" h-full mt-0 border-none">
                 <div
@@ -396,12 +552,13 @@ function ManageProject(props: Props) {
                     {/* Your existing Manage Task content */}
 
                     {/* Add the task list */}
-                    <div className="task-list">
+                    <div className="task-list mt-6">
                       {projectTasks.map((task) => (
                         <Task
                           key={task.id}
                           fetchID={task.id}
                           isDarkMode={isDarkMode}
+                          currentUserEmail={props.userDetail.emailId}
                         />
                       ))}
                     </div>
@@ -576,23 +733,23 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: {
-    xs: '95%',    // Mobile
-    sm: '90%',    // Small tablets
-    md: '85%',    // Tablets
-    lg: '80%',    // Small desktop
-    xl: '75%'     // Large desktop
+    xs: "95%", // Mobile
+    sm: "90%", // Small tablets
+    md: "85%", // Tablets
+    lg: "80%", // Small desktop
+    xl: "75%", // Large desktop
   },
   maxHeight: {
-    xs: '95vh',   // Mobile
-    sm: '90vh',   // Tablets
-    md: '85vh',   // Desktop
-    xl: '80vh'    // Large screens
+    xs: "95vh", // Mobile
+    sm: "90vh", // Tablets
+    md: "85vh", // Desktop
+    xl: "80vh", // Large screens
   },
   margin: {
-    xs: '10px',   // Mobile
-    sm: '20px',   // Tablets
-    md: '30px'    // Desktop
-  }
+    xs: "10px", // Mobile
+    sm: "20px", // Tablets
+    md: "30px", // Desktop
+  },
 };
 
 interface ModalContentProps {

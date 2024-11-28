@@ -15,45 +15,55 @@ export const maxDuration = 60 // Extend timeout to 60 seconds
 // Define uploadDir constant
 const uploadDir = join(process.cwd(), 'public', 'uploads');
 
+// In src/app/api/task/route.ts
+
 export async function POST(request: NextRequest) {
   try {
     if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(process.env.MONGODB_URI+'', {
-          serverSelectionTimeoutMS: 15000,
-          socketTimeoutMS: 45000,
-          connectTimeoutMS: 15000,
+      await mongoose.connect(process.env.MONGODB_URI + '', {
+        serverSelectionTimeoutMS: 15000,
+        socketTimeoutMS: 45000,
+        connectTimeoutMS: 15000,
       });
-  }
+    }
     const { fields, fileUrl } = await parseForm(request, uploadDir);
-    
+
     // Extract task details
-    const description = Array.isArray(fields.description) 
-      ? fields.description[0] 
+    const description = Array.isArray(fields.description)
+      ? fields.description[0]
       : fields.description || '';
 
     // Parse assignee emails from form data
-    const assigneeEmails = fields.assignees 
-      ? JSON.parse(Array.isArray(fields.assignees) ? fields.assignees[0] : fields.assignees) 
+    const assigneeEmails = fields.assignees
+      ? JSON.parse(Array.isArray(fields.assignees) ? fields.assignees[0] : fields.assignees)
       : [];
 
-    // Get project name from form data
     const projectName = Array.isArray(fields.projectName)
       ? fields.projectName[0]
       : fields.projectName || '';
-      // console.log(projectName);
-    
-      const projectId = Array.isArray(fields.projectId)
+
+    const projectId = Array.isArray(fields.projectId)
       ? fields.projectId[0]
       : fields.projectId || '';
 
-    // Create task in database
+    // Validate required fields
+    if (!description || !projectName || !projectId) {
+      return NextResponse.json(
+        { success: false, message: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Create task with updated schema fields
     const task = await Task.create({
       description,
       assignees: assigneeEmails,
       fileUrl,
-      projectName, // Add project name
-      projectId, //
+      projectName,
+      projectId,
       createdAt: new Date(),
+      submitted: false, // Initialize as not submitted
+      approvals: [], // Initialize with empty approvals array
     });
 
     // Update each assignee's user document
@@ -78,9 +88,11 @@ export async function POST(request: NextRequest) {
         description,
         assignees: assigneeEmails,
         fileUrl,
-        projectName, // Include in response
-        projectId, //
-        createdAt: task.createdAt
+        projectName,
+        projectId,
+        createdAt: task.createdAt,
+        submitted: task.submitted,
+        approvals: task.approvals
       },
     });
   } catch (error) {
@@ -94,9 +106,9 @@ export async function POST(request: NextRequest) {
 
 async function parseForm(req: NextRequest, uploadDir: string): Promise<{ fields: Fields; fileUrl: string | null }> {
   return new Promise(async (resolve, reject) => {
-    const form = formidable({ 
-      uploadDir, 
-      keepExtensions: true, 
+    const form = formidable({
+      uploadDir,
+      keepExtensions: true,
       maxFileSize: 10 * 1024 * 1024,
       filename: (name, ext, path, form) => {
         return `${Date.now()}-${path}`;
@@ -162,15 +174,15 @@ async function parseForm(req: NextRequest, uploadDir: string): Promise<{ fields:
 export async function GET(request: NextRequest) {
   try {
     if (mongoose.connection.readyState !== 1) {
-      await mongoose.connect(process.env.MONGODB_URI+'', {
-          serverSelectionTimeoutMS: 15000,
-          socketTimeoutMS: 45000,
-          connectTimeoutMS: 15000,
+      await mongoose.connect(process.env.MONGODB_URI + '', {
+        serverSelectionTimeoutMS: 15000,
+        socketTimeoutMS: 45000,
+        connectTimeoutMS: 15000,
       });
-  }
+    }
     const taskId = request.nextUrl.searchParams.get('id');
     const projectId = request.nextUrl.searchParams.get('projectId');
-    
+
     if (!taskId && !projectId) {
       return NextResponse.json(
         { success: false, message: 'Task ID is required' },
@@ -186,10 +198,10 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         );
       }
-      
+
       // Fetch all tasks for the project
       const tasks = await Task.find({ projectId: projectId });
-      
+
       return NextResponse.json({
         success: true,
         tasks: tasks.map(task => ({
@@ -198,13 +210,16 @@ export async function GET(request: NextRequest) {
           assignees: task.assignees,
           fileUrl: task.fileUrl,
           projectName: task.projectName,
-          createdAt: task.createdAt
+          projectId: task.projectId,
+          createdAt: task.createdAt,
+          submitted: task.submitted,
+          approvals: task.approvals
         }))
       });
     }
 
     const task = await Task.findById(taskId);
-    
+
     if (!task) {
       return NextResponse.json(
         { success: false, message: 'Task not found' },

@@ -17,13 +17,13 @@ const Contributor: React.FC<ContributorProps> = ({ contributorEmailId, isDarkMod
   const fetchData = async () => {
     try {
       // Fix 1: Template literal syntax correction
-      const response = await fetch(`/api/user-search?t=${contributorEmailId}`);
+      const response = await fetch(`/api/user-search?t=${encodeURIComponent(contributorEmailId)}`);
       if (!response.ok) throw new Error('Failed to fetch contributor data');
       
       const data = await response.json();
       setContributorInfo({
-        name: data.name || "",
-        profilePic: data.profilePic || "",
+        name: data[0].name,
+        profilePic: data[0].profilePic,
       });
       setFetchAgain(false);
     } catch (error) {
@@ -49,7 +49,7 @@ const Contributor: React.FC<ContributorProps> = ({ contributorEmailId, isDarkMod
             isDarkMode
               ? "bg-dark-bg-secondary text-dark-text border-0 border-dark-border hover:border-dark-border-hover"
               : "bg-white text-black border-2 border-gray-200 hover:border-gray-300"
-          }`}
+          }`}        
       >
         <Avatar 
           src={contributorInfo?.profilePic} 

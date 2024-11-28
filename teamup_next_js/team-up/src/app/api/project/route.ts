@@ -167,10 +167,40 @@ export async function POST(request: NextRequest) {
             socketTimeoutMS: 45000,
             connectTimeoutMS: 15000,
         });
-    }
+      }
       for (const projectId of toLeave) {
         const project = await Project.findOne({ _id: projectId });
         if (!project) continue;
+
+        // Get tasks assigned to the leaving user for this project
+        const userTasks = await Task.find({ 
+          projectId: projectId,
+          assignees: emailId 
+        });
+
+        // Remove these tasks from the leaving user
+        if (userTasks.length > 0) {
+          // Remove task IDs from the user document
+          await User.findOneAndUpdate(
+            { emailId: emailId },
+            { $pull: { tasks: { $in: userTasks.map(task => task._id) } } }
+          );
+
+          // Delete the tasks where this user was the only assignee
+          await Task.deleteMany({
+            projectId: projectId,
+            assignees: { $size: 1, $elemMatch: { $eq: emailId } }
+          });
+
+          // Remove this user from assignees in tasks with multiple assignees
+          await Task.updateMany(
+            { 
+              projectId: projectId,
+              assignees: emailId
+            },
+            { $pull: { assignees: emailId } }
+          );
+        }
 
         const maintainers = project.maintainers;
         if (maintainers.indexOf(emailId) > -1) {
@@ -203,4 +233,52 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ message: 'No action performed' }, { status: 400 });
+}
+
+// Add this PUT function to the existing route.ts file
+export async function PUT(request: NextRequest) {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(process.env.MONGODB_URI+'', {
+        serverSelectionTimeoutMS: 15000,
+        socketTimeoutMS: 45000,
+        connectTimeoutMS: 15000,
+      });
+    }
+
+    const body = await request.json();
+    const { projectId, description } = body;
+
+    if (!projectId || description === undefined) {
+      return NextResponse.json(
+        { message: 'Project ID and description are required' },
+        { status: 400 }
+      );
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      { description: description },
+      { new: true } // Returns the updated document
+    );
+
+    if (!updatedProject) {
+      return NextResponse.json(
+        { message: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: 'Description updated successfully', project: updatedProject },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error('Error updating project description:', error);
+    return NextResponse.json(
+      { message: 'Error updating project description' },
+      { status: 500 }
+    );
+  }
 }
