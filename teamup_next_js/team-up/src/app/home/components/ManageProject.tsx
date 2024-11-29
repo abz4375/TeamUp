@@ -410,7 +410,7 @@ function ManageProject(props: Props) {
                               children={String(children).replace(/\n$/, "")}
                               language={match[1]}
                               style={vscDarkPlus}
-                              ref={null}
+                              // ref={null}
                             />
                           ) : (
                             <div
@@ -420,7 +420,7 @@ function ManageProject(props: Props) {
                                   ? "bg-gray-700 rounded-md px-1 font-mono w-fit inline-block"
                                   : "bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
                               }
-                              ref={null}
+                              // ref={null}
                             >
                               {children}
                             </div>
