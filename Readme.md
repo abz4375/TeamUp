@@ -1,75 +1,102 @@
-# TeamUp - A Collaborative Project Management Platform 🚀
+# TeamUp - A Modern Collaborative Project Management Platform 🚀
 
-TeamUp is a web application built with Next.js 💻 that simplifies project management and fosters team collaboration 🤝. This platform empowers teams to seamlessly create 🏗️, manage 📊, and contribute to projects 💪, enhancing productivity 📈 and streamlining workflows 💨.
+TeamUp is a full-stack web application built with Next.js 13+ that transforms project management and team collaboration. With real-time updates, task approval workflows, and comprehensive project management features, TeamUp helps teams work more efficiently together.
 
-## Features 
+## Core Features 
 
-### 1. User Authentication
+### 1. Enhanced User Authentication
+- **Google OAuth Integration:** Secure authentication using Google credentials 🔐
+- **Profile Management:** User profiles with customizable avatars and email verification
+- **Role-Based Access:** Granular permission system for project access
 
-- **Sign Up:** New users can easily create accounts 👤 using their Google credentials 🔐 for secure access.
-- **Login:** Registered users can securely log in 🔑 to their accounts to manage projects and tasks.
+### 2. Comprehensive Project Management
+- **Project Creation:** Initialize projects with Markdown-rich descriptions 📝
+- **Team Management:** 
+  - Invite team members through email search
+  - Assign roles (owner 👑, maintainer 🔧, contributor 👷)
+  - Remove members with automatic task reassignment
+- **Project Deletion:** Safely remove projects with cleanup of associated tasks and user references
 
-### 2. Project Creation
+### 3. Advanced Task Management
+- **Task Creation:** 
+  - Create detailed tasks with rich descriptions
+  - Upload and attach files to tasks 📎
+  - Assign multiple team members to tasks
+- **Task Workflow:**
+  - Submit completed tasks for review
+  - Multi-stage approval process by project maintainers ✅
+  - Progress tracking with visual indicators
+- **Task Status:** Real-time progress bars showing approval status
 
-- **Initiate New Projects:** Users can initiate new projects 💡, providing a descriptive title 📝 and detailed Markdown-formatted description.
-- **Team Formation:** Project creators can effortlessly invite collaborators 👥 by searching for their usernames and assigning roles (owner 👑, maintainer 🔧, contributor 👷).
+### 4. User Experience
+- **Dark/Light Mode:** Toggle between dark and light themes for comfortable viewing 🌓
+- **Responsive Design:** Fully responsive interface across devices
+- **Real-time Updates:** Instant reflection of project and task changes
+- **Markdown Support:** Rich text formatting for project and task descriptions
 
-### 3. Project Management
+### 5. File Management
+- **File Attachments:** Upload and manage files associated with tasks
+- **Secure Storage:** Safe file storage and access control
 
-- **Project Overview:** View comprehensive project information, including title, description, members, tasks, and contributions.
-- **Role-Based Access Control:** Owners have full control over projects, while maintainers can edit details and invite contributors. Contributors can participate in assigned tasks.
-- **Task Management:**  Projects can be divided into tasks 🎯, allowing for efficient task allocation and tracking progress 📈.
+## Technical Stack
 
-### 4. Real-time Updates
-
-- **Live Reloading:** The platform provides real-time updates ⚡, ensuring all team members stay informed about project modifications, task updates, and new contributions.
-
-### 5. User-Friendly Interface
-
-- **Intuitive Navigation:** TeamUp features an intuitive and user-friendly interface 🧭 for easy navigation and project management.
-- **Markdown Support:** Project descriptions and task details can be formatted using Markdown ✍️ for enhanced readability and organization.
-
-## Guide
-
-### Creating a Project
-
-1.  **Login** 🔑 to your TeamUp account.
-2.  Click on the "Create Project" button.
-3.  Provide a project title 📝 and description (Markdown supported).
-4.  Search and add team members 👥, assigning appropriate roles.
-5.  Click "Submit" to create the project.
-
-### Managing a Project
-
-1.  Navigate to the project's overview page.
-2.  **Edit Project Details:** Owners 👑 and maintainers 🔧 can edit the project's title and description.
-3.  **Invite Contributors:**  Owners 👑 and maintainers 🔧 can invite new contributors 👥.
-4.  **Create Tasks:** Breakdown the project into manageable tasks 🎯, assigning them to team members.
-5.  **Track Progress:** Monitor task completion and project progress through real-time updates ⚡.
-
-### Contributing to a Project
-
-1.  Access the project you're a contributor to.
-2.  View assigned tasks 🎯 and their details.
-3.  Update task status as you progress.
-4.  Communicate with team members 💬 through project discussions.
-
-## Technologies Used
-
-- Next.js 💻
-- MongoDB 🗃️
-- Google Authentication 🔐
+- **Frontend:** Next.js 13+, React, Material-UI
+- **Backend:** Next.js API Routes
+- **Database:** MongoDB with Mongoose
+- **Authentication:** NextAuth.js with Google Provider
+- **Storage:** File upload capabilities with form handling
 
 ## Getting Started
 
-1.  Clone the repository: git clone https://github.com/abz4375/TeamUp.git
-2.  Install dependencies: npm install
-3.  Set up your MongoDB database and configure the connection URI.
-4.  Create a Google Cloud Platform project and configure OAuth 2.0 credentials.
-5.  Start the development server: npm run dev
+1. Clone the repository:
+```bash
+git clone https://github.com/abz4375/TeamUp.git
+```
 
-## Contribution
+2. Install dependencies:
+```bash
+cd TeamUp
+npm install
+```
 
-Contributions are welcome! Please feel free to open issues or submit pull requests.
+3. Configure environment variables:
+```env
+MONGODB_URI=your_mongodb_uri
+AUTH_GOOGLE_ID=your_google_client_id
+AUTH_GOOGLE_SECRET=your_google_client_secret
+```
 
-Let's TeamUp to make project management a breeze! 💨
+4. Run the development server:
+```bash
+npm run dev
+```
+
+## Project Structure
+
+```
+team-up/
+├── src/
+│   ├── app/            # Next.js 13+ app directory
+│   ├── components/     # Reusable React components
+│   └── models/         # MongoDB schemas
+├── public/            # Static assets
+└── config/           # Configuration files
+```
+
+## Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+Built with 💻 by the TeamUp team
