@@ -72,14 +72,14 @@ const Project = (props: any) => {
           ? `https://${process.env.VERCEL_URL}`
           : "http://localhost:3000";
         const response = await fetch(
-          `/api/project?id=` + props.projectId + "&info=forDeletePage"
+          `/api/project/` + props.projectId + "/delete"
         );
         if (response.ok) {
           const responseJson = await response.json();
 
           if (await responseJson) {
             // router.push('/log-in')
-            setInfo(await responseJson);
+            setInfo(await responseJson.data);
             setFetchAgain(false);
             // console.log(responseJson);
           }
@@ -291,13 +291,13 @@ function DeleteProjectPage(props: any) {
         const baseURL = process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
           : "http://localhost:3000";
-        const response = await fetch(`/api/project?id=` + props.projectPageId);
+        const response = await fetch(`/api/project/` + props.projectPageId);
         if (response.ok) {
           const responseJson = await response.json();
 
-          if (await responseJson[0]) {
+          if (await responseJson) {
             // router.push('/log-in')
-            setInfo(await responseJson[0]);
+            setInfo(await responseJson);
             setFetchAgain(false);
             // console.log(responseJson);
           }

@@ -52,6 +52,12 @@ export default async function middleware(req:NextRequest) {
         return NextResponse.redirect(url);
     }
 
+    if (pathname == '/') {
+        const url = req.nextUrl.clone();
+        url.pathname = '/log-in';
+        return NextResponse.redirect(url);
+    }
+
     return NextResponse.next();
 }
 /*

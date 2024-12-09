@@ -29,6 +29,15 @@ const projectSchema = new mongoose.Schema({
     // required: [true, 'Please add contributions'],
   },
 }, { timestamps: true });
+
+projectSchema.index({ owner: 1 });
+projectSchema.index({ contributors: 1 });
+projectSchema.index({ maintainers: 1 });
+projectSchema.index({ title: 1 });
+projectSchema.index({ 'tasks': 1 });
+projectSchema.index({ owner: 1, title: 1 });
+projectSchema.index({ 'tasks.status': 1 });
+projectSchema.index({ createdAt: 1 });
 /*
 userSchema.pre('save', async function(next) {
   const user = this;

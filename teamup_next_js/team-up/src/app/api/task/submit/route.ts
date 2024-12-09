@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Task } from '../../../../../models/taskModel';
+import { createApiResponse } from '../../utils/apiHandler';
 import mongoose from 'mongoose';
 
 export async function POST(request: NextRequest) {
@@ -13,27 +14,32 @@ export async function POST(request: NextRequest) {
     }
 
     const { taskId, userEmail } = await request.json();
-
     const task = await Task.findById(taskId);
+    
     if (!task) {
-      return NextResponse.json({ success: false, message: 'Task not found' }, { status: 404 });
+      return NextResponse.json(
+        createApiResponse(false, null, 'Task not found', 404),
+        { headers: { 'Cache-Control': 'no-store' }}
+      );
     }
 
-    // Update task to mark as submitted
     task.submitted = true;
     await task.save();
 
-    return NextResponse.json({ 
-      success: true,
-      message: 'Task submitted successfully',
-      task
-    });
+    return NextResponse.json(
+      createApiResponse(true, { task }, 'Task submitted successfully'),
+      { 
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
+        }
+      }
+    );
 
   } catch (error) {
-    console.error('Error submitting task:', error);
     return NextResponse.json(
-      { success: false, message: 'Error submitting task' },
-      { status: 500 }
+      createApiResponse(false, null, 'Error submitting task', 500),
+      { headers: { 'Cache-Control': 'no-store' }}
     );
   }
 }

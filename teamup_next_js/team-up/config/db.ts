@@ -2,14 +2,15 @@
 import mongoose from "mongoose"
 
 export const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI+'', {
-            serverSelectionTimeoutMS: 15000, // Timeout after 15s instead of 30s
-            socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-            connectTimeoutMS: 15000,
-        })
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(error)
+    if (mongoose.connection.readyState !== 1) {
+        await mongoose.connect(process.env.MONGODB_URI+'', {
+            maxPoolSize: 50,  // Optimized pool size
+            minPoolSize: 10,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 10000,
+            maxIdleTimeMS: 30000,
+            compressors: "zlib"  // Network compression
+        });
     }
-}
+};

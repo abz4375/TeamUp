@@ -95,12 +95,12 @@ function ManageProject(props: Props) {
     const fetchData = async () => {
       if (fetchAgain && props.projectPageId) {
         const baseURL = process.env.VERCEL_URL;
-        const response = await fetch(`/api/project?id=` + props.projectPageId);
+        const response = await fetch(`/api/project/` + props.projectPageId+'/');
         if (response.ok) {
           const responseJson = await response.json();
 
-          if (await responseJson[0]) {
-            setInfo(await responseJson[0]);
+          if (await responseJson) {
+            setInfo(await responseJson);
             setFetchAgain(false);
           }
         } else if (response.status === 404) {
@@ -410,20 +410,20 @@ function ManageProject(props: Props) {
                               children={String(children).replace(/\n$/, "")}
                               language={match[1]}
                               style={vscDarkPlus}
-                              // ref={null}
+                              ref={null}
                             />
                           ) : (
-                            <div
+                            <code
                               {...rest}
                               className={
                                 isDarkMode
                                   ? "bg-gray-700 rounded-md px-1 font-mono w-fit inline-block"
                                   : "bg-gray-200 rounded-md px-1 font-mono w-fit inline-block"
                               }
-                              // ref={null}
+                              ref={null}
                             >
                               {children}
-                            </div>
+                            </code>
                           );
                         },
                       }}

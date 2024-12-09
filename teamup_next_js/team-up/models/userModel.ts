@@ -46,6 +46,11 @@ const userSchema = new mongoose.Schema({
     // required: [true, 'Please add contributions'],
   },
 }, { timestamps: true });
+
+userSchema.index({ emailId: 1 }, { unique: true });
+userSchema.index({ tasks: 1 });
+userSchema.index({ projects: 1 });
+
 /*
 // userSchema.pre('save', async function(next) {
 //   const user = this;
