@@ -4,6 +4,9 @@ import { Project } from '../../../../../../models/projectModel';
 import { User } from '../../../../../../models/userModel';
 import { createApiResponse } from '../../../utils/apiHandler';
 
+export const revalidate = 60 // Cache project data for 60 seconds
+export const maxDuration = 60
+
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const project = await Project.findById(params.id);

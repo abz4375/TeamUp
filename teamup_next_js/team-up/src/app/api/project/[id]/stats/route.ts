@@ -5,6 +5,9 @@ import { Task } from '../../../../../../models/taskModel';
 import { createApiResponse } from '../../../utils/apiHandler';
 import mongoose from 'mongoose';
 
+export const revalidate = 60 // Cache project data for 60 seconds
+export const maxDuration = 60
+
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const projectStats = await Project.aggregate([
