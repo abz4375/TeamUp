@@ -1,4 +1,4 @@
-# TeamUp - A Modern Collaborative Project Management Platform 🚀
+# TeamUp - A Modern Collaborative Project Management Platform 🚀 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/abz4375/TeamUp)
 
 TeamUp is a full-stack web application built with Next.js 13+ that transforms project management and team collaboration. With real-time updates, task approval workflows, and comprehensive project management features, TeamUp helps teams work more efficiently together.
 
