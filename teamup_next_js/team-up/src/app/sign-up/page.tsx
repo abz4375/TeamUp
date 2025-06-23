@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { TextField } from "@mui/material";
-// import logo from "../../assets/logo.png";
 import logo from "../assets/logo.png";
 import { signInBtnFunc } from "../log-in/components/signInWithGoogle";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -16,9 +16,9 @@ const SignUp = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
-      alert("Please Confirm the Password");
+      alert("Passwords do not match. Please confirm your password.");
       return;
     }
 
@@ -31,7 +31,7 @@ const SignUp = () => {
     };
 
     try {
-      const response = await fetch('/api/sign-up', {
+      const response = await fetch("/api/sign-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -40,117 +40,167 @@ const SignUp = () => {
       if (response.ok) {
         const responseJson = await response.json();
         console.log("Signup successful:", responseJson);
-        // Handle successful signup (e.g., redirect to login page)
+        // Handle successful signup (e.g., redirect to login page or show a success message)
+        alert("Sign up successful! Please log in.");
+        setFirstName("");
+        setLastName("");
+        setUsername("");
+        setEmailId("");
+        setPassword("");
+        setConfirmPassword("");
+        // Consider redirecting: window.location.href = '/log-in';
       } else {
-        console.error("Signup failed:", response.statusText);
+        const errorData = await response.json();
+        console.error("Signup failed:", response.statusText, errorData);
+        alert(`Sign up failed: ${errorData.message || response.statusText}`);
       }
     } catch (error) {
       console.error("Error during signup:", error);
+      alert("An unexpected error occurred during sign up. Please try again.");
     }
   };
 
   return (
-    <div className="flex w-screen h-screen items-center justify-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 mx-4">
+    <div className="flex w-screen min-h-screen items-center justify-center p-4 bg-gradient-to-br from-slate-100 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-sky-950 dark:to-indigo-950">
+      <div className="w-full max-w-lg bg-white dark:bg-slate-800 shadow-2xl rounded-xl p-8 sm:p-10 mx-4 my-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-          <img src={logo.src} alt="logo" className="w-12 h-12 sm:w-10 sm:h-10" />
-          <span className="text-center text-2xl sm:text-3xl font-light">
-            Join <span className="font-semibold">Team Up</span>!
-          </span>
+        <div className="flex flex-col items-center justify-center gap-4 mb-8">
+          <img src={logo.src} alt="logo" className="w-16 h-16 sm:w-20 sm:h-20" />
+          <h1 className="text-center text-3xl sm:text-4xl font-light text-slate-700 dark:text-slate-200">
+            Join <span className="font-semibold text-blue-600 dark:text-blue-400">Team Up</span>!
+          </h1>
         </div>
 
         {/* Sign Up Form */}
-        <form onSubmit={handleSignUp} className="space-y-4 mb-6">
-          <div className="flex gap-4">
-            <TextField
-              fullWidth
-              label="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              variant="outlined"
-            />
-            <TextField
-              fullWidth
-              label="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              variant="outlined"
+        <form onSubmit={handleSignUp} className="space-y-5 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                First Name
+              </label>
+              <Input
+                id="firstName"
+                placeholder="John"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="h-11 text-base"
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                Last Name
+              </label>
+              <Input
+                id="lastName"
+                placeholder="Doe"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="h-11 text-base"
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Username
+            </label>
+            <Input
+              id="username"
+              placeholder="johndoe"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="h-11 text-base"
             />
           </div>
-          <TextField
-            fullWidth
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            value={emailId}
-            onChange={(e) => setEmailId(e.target.value)}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            variant="outlined"
-          />
-          <button
+          <div>
+            <label htmlFor="emailId" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Email address
+            </label>
+            <Input
+              id="emailId"
+              type="email"
+              placeholder="you@example.com"
+              value={emailId}
+              onChange={(e) => setEmailId(e.target.value)}
+              required
+              className="h-11 text-base"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="h-11 text-base"
+            />
+          </div>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Confirm Password
+            </label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="h-11 text-base"
+            />
+          </div>
+          <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 
-                     font-semibold rounded-lg transition 
-                     flex items-center justify-center
-                     shadow-sm hover:shadow focus:outline-none focus:ring-2 
-                     focus:ring-blue-300 focus:ring-opacity-50"
+            className="w-full h-12 text-lg font-semibold"
+            size="lg"
           >
-            Sign Up
-          </button>
+            Create Account
+          </Button>
         </form>
 
         {/* Divider */}
-        <div className="relative my-6">
+        <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+            <span className="px-4 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+              or sign up with
+            </span>
           </div>
         </div>
 
-        {/* Google Sign In Button */}
+        {/* Google Sign Up Button */}
         <form action={signInBtnFunc} className="w-full">
-          <button
+          <Button
             type="submit"
-            className="w-full bg-blue-100 hover:bg-blue-200 px-6 py-3 
-                     text-gray-800 font-semibold rounded-lg transition 
-                     flex items-center justify-center gap-3 
-                     shadow-sm hover:shadow focus:outline-none focus:ring-2 
-                     focus:ring-blue-300 focus:ring-opacity-50"
+            variant="outline"
+            className="w-full h-12 text-base font-medium"
+            size="lg"
           >
             <img
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               src="https://img.icons8.com/color/48/google-logo.png"
               alt="google-logo"
-              className="w-6 h-6"
+              className="w-5 h-5 mr-3"
             />
-            <span className="whitespace-nowrap">Sign Up with Google</span>
-          </button>
+            Sign Up with Google
+          </Button>
         </form>
+        <p className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+          Already have an account?{' '}
+          <a href="/log-in" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+            Log In
+          </a>
+        </p>
       </div>
     </div>
   );

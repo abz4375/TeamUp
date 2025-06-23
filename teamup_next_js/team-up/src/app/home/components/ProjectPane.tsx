@@ -1,206 +1,253 @@
 "use client";
-import React, { FC } from "react";
+import React, { useEffect, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import "./projectpane.css";
-import {
-  Avatar,
-  Box,
-  Chip,
-  IconButton,
-  Paper,
-  Stack,
-  Tooltip,
-} from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
-// import Box from '@mui/material/Box';
-// import Paper from '@mui/material/Paper';
-// import Stack from '@mui/material/Stack';
+import { Avatar as ShadcnAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button"; // Added Button for the "Form a New Team"
+import { SlidersHorizontal, Loader2 } from "lucide-react";
 
-// interface ProjectProps {
-//   id: string;
-// }
+interface ProjectInfo {
+  title: string;
+  ownerName: string;
+  ownerPic: string;
+  updatedAt: Date | string;
+  ownerEmailId: string;
+}
 
-const Project = (props: any) => {
-  const [info, setInfo] = React.useState({
-    title: "",
-    ownerName: "",
-    ownerPic: "",
-    updatedAt: new Date(),
-    ownerEmailId: "",
-  });
-  const [fetchAgain, setFetchAgain] = React.useState(true);
-  React.useEffect(() => {
+interface ProjectCardProps {
+  projectId: string;
+  isDarkMode: boolean;
+  email: string;
+  setProjectToggle: (value: boolean) => void;
+  setProjectPageId: (id: string) => void;
+}
+
+const ProjectCard = (props: ProjectCardProps) => {
+  const [info, setInfo] = useState<ProjectInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Manage loading state for each card
+  const [error, setError] = useState<string | null>(null); // Manage error state
+
+  useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates on unmounted component
     const fetchData = async () => {
-      // console.log('fetch again:',fetchAgain,'projectid:',props.projectId)
-      if (fetchAgain && props.projectId) {
-        // setTimeout(async() => {
-          const baseURL = process.env.VERCEL_URL 
-          ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
-        const response = await fetch(
-          `/api/project/` +
-            props.projectId +
-            "/dashboard"
-        );
+      if (!props.projectId) {
+        setIsLoading(false);
+        setError("Project ID is missing.");
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`/api/project/${props.projectId}/dashboard`);
+        if (!isMounted) return;
+
         if (response.ok) {
           const responseJson = await response.json();
-
-          if (await responseJson) {
-            // router.push('/log-in')
-            setInfo(await responseJson.data);
-            setFetchAgain(false);
-            // console.log(responseJson);
+          if (responseJson && responseJson.data) {
+            setInfo(responseJson.data);
+          } else {
+            setError("Project data not found in response.");
+            console.error("Project data not found in response:", responseJson);
           }
-        } else if (response.status === 404) {
-          console.error("Fetch failed:", response.statusText);
-          // return;
-          setFetchAgain(false);
         } else {
-          setFetchAgain(true);
+          setError(`Fetch failed: ${response.status} ${response.statusText}`);
+          console.error("Fetch failed:", response.status, response.statusText);
         }
-        // }, 1000);
+      } catch (err) {
+        if (!isMounted) return;
+        setError("Error fetching project data.");
+        console.error("Error fetching project data:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchData();
-  }, []);
-  return (
-    // <Box
-    //   sx={{
-    //     display: 'flex',
-    //     flexWrap: 'wrap',
-    //     '& > :not(style)': {
-    //       m: 1,
-    //       width: 160,
-    //       height: 160,
-    //     },
-    //   }}
-    // >
-    //   <Paper elevation={5} >
-    //   <Stack direction="row" spacing={1} >
-    //   <center><code>Team-Name</code></center>
-    // </Stack>
-    //   </Paper>
-    // </Box>
-    <Tooltip arrow placement="right" title={` Open`}>
-      <div 
-        className={`cursor-pointer min-w-72 w-72 h-72 mx-3 my-4 border-2 rounded-xl hover:mt-3 hover:mb-5 transition-all grid select-none active:border-opacity-80 hover:shadow-lg
-        ${props.isDarkMode 
-          ? 'bg-gray-800 border-gray-600 hover:border-gray-500 hover:bg-gray-700' 
-          : 'bg-gray-50 border-gray-400 hover:border-gray-700 hover:bg-gray-100'}`} 
-        onClick={() => {props.setProjectToggle(true); props.setProjectPageId(props.projectId)}}
+
+    return () => {
+      isMounted = false; // Cleanup function to set isMounted to false when component unmounts
+    };
+  }, [props.projectId]); // Dependency array includes props.projectId
+
+  if (isLoading) {
+    return (
+      <div className={`cursor-pointer min-w-[18rem] w-72 h-72 mx-3 my-4 border rounded-xl shadow-lg
+        flex flex-col items-center justify-center p-4
+        ${props.isDarkMode
+          ? 'bg-slate-800 border-slate-700'
+          : 'bg-slate-50 border-slate-300'}`}
       >
-        <div className="flex my-2 mt-8 flex-col w-full p-2">
-          <span className={`transition-all w-full text-center mx-auto my-2 text-3xl font-normal select-text
-            ${props.isDarkMode ? 'text-gray-200 selection:bg-blue-800' : 'text-gray-800 selection:bg-blue-200'} 
-            selection:blur-md`}>
-            {info?.title}
-          </span>
-          {info?.ownerEmailId === props.email ? (
-            <span className="w-full text-center mx-auto mt-auto mb-0 text-xs font-light">
-              <Chip
-                className={`text-md mt-2 cursor-pointer font-normal
-                  ${props.isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
-                label='Admin Panel'
-                avatar={<TuneIcon className={props.isDarkMode ? 'text-gray-300' : 'text-gray-600'} />}
-              />
-            </span>
-          ) : (
-            <span className="w-full text-center mx-auto mt-auto mb-0 text-xs font-light">
-              Owned by <br />
-              <Chip
-                className={`text-md mt-2 cursor-pointer font-normal
-                  ${props.isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
-                label={info?.ownerEmailId === props.email ? "You" : info?.ownerName}
-                avatar={<Avatar src={info?.ownerPic} />}
-              />
-            </span>
-          )}
-        </div>
+        <Loader2 className={`animate-spin h-12 w-12 ${props.isDarkMode ? 'text-sky-400' : 'text-sky-600'}`} />
+        <p className={`mt-4 text-sm ${props.isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Loading Project...</p>
       </div>
-    </Tooltip>
+    );
+  }
+
+  if (error || !info) {
+    return (
+      <div className={`cursor-pointer min-w-[18rem] w-72 h-72 mx-3 my-4 border border-red-500/50 rounded-xl shadow-lg
+        flex flex-col items-center justify-center p-4 text-center
+        ${props.isDarkMode
+          ? 'bg-slate-800 text-red-400'
+          : 'bg-slate-50 text-red-600'}`}
+      >
+        <p className="font-semibold">Error loading project</p>
+        <p className="text-xs mt-1">{error || "Details unavailable."}</p>
+      </div>
+    );
+  }
+
+  const isAdmin = info.ownerEmailId === props.email;
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`cursor-pointer min-w-[18rem] w-72 h-72 mx-3 my-4 border rounded-xl
+              hover:shadow-xl transition-all duration-200 group
+              flex flex-col justify-between p-5 overflow-hidden relative
+              ${props.isDarkMode
+                ? 'bg-slate-800 border-slate-700 hover:border-blue-600 hover:bg-slate-700/60'
+                : 'bg-white border-slate-300 hover:border-blue-500 hover:bg-slate-50'}`}
+            onClick={() => { props.setProjectToggle(true); props.setProjectPageId(props.projectId); }}
+          >
+            <div className="flex flex-col items-center text-center pt-2">
+              <h3 className={`text-xl font-semibold truncate w-full mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400
+                ${props.isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                {info.title || "Untitled Project"}
+              </h3>
+              {/* Optional: Add a short description or last updated date here */}
+            </div>
+
+            <div className="flex flex-col items-center text-center text-xs pb-2">
+              {isAdmin ? (
+                <Badge variant={props.isDarkMode ? "outline" : "default"} className={`py-1.5 px-3 text-sm font-medium ${props.isDarkMode ? 'border-sky-500 text-sky-400' : 'bg-sky-600 text-white'}`}>
+                  <SlidersHorizontal size={14} className="mr-1.5" />
+                  Admin Panel
+                </Badge>
+              ) : (
+                <>
+                  <p className={`mb-1.5 ${props.isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Owned by</p>
+                  <div className="flex items-center">
+                    <ShadcnAvatar className="w-7 h-7 mr-2 border-2 dark:border-slate-600">
+                      <AvatarImage src={info.ownerPic} alt={info.ownerName || 'Owner'} />
+                      <AvatarFallback className="text-xs">{info.ownerName ? info.ownerName.substring(0, 1).toUpperCase() : 'U'}</AvatarFallback>
+                    </ShadcnAvatar>
+                    <span className={`${props.isDarkMode ? 'text-slate-300' : 'text-slate-700'} font-medium text-sm`}>
+                      {info.ownerEmailId === props.email ? "You" : (info.ownerName || "Unknown User")}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className={`absolute -bottom-8 -right-8 w-20 h-20 rounded-full
+              ${props.isDarkMode ? 'bg-blue-600/10' : 'bg-blue-500/5'}
+              group-hover:scale-[2.5] transition-transform duration-300 opacity-70 group-hover:opacity-100`}
+            />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="bg-slate-800 text-white border-slate-700">
+          <p>Open: {info.title || "Project"}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
-const ProjectPane = (props: any) => {
+interface ProjectPaneProps {
+  projects: string[] | null | undefined;
+  isDarkMode: boolean;
+  email: string;
+  setProjectToggle: (value: boolean) => void; // For opening create/manage project modal
+  setProjectPageId: (id: string) => void; // For opening specific project
+  // funcToPass from Sidebar was for createTeamToggle, this is similar
+  createTeamToggle?: boolean; // Prop from parent to trigger create team modal
+  funcToPass?: (value: boolean) => void; // If create team is handled by this pane
+}
+
+const ProjectPane = (props: ProjectPaneProps) => {
   const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5,
-    },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 4,
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2,
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1,
-    },
+    superLargeDesktop: { breakpoint: { max: 4000, min: 1600 }, items: 4, partialVisibilityGutter: 30 },
+    desktop: { breakpoint: { max: 1600, min: 1280 }, items: 3, partialVisibilityGutter: 30 },
+    largeTablet: { breakpoint: { max: 1280, min: 1024 }, items: 3, partialVisibilityGutter: 20 },
+    tablet: { breakpoint: { max: 1024, min: 768 }, items: 2, partialVisibilityGutter: 20 },
+    mobile: { breakpoint: { max: 768, min: 0 }, items: 1, partialVisibilityGutter: 10 },
   };
-  // const responsive = {
-  //   desktop: {
-  //     breakpoint: { max: 3000, min: 1024 },
-  //     items: 3,
-  //     slidesToSlide: 3 // optional, default to 1.
-  //   },
-  //   tablet: {
-  //     breakpoint: { max: 1024, min: 464 },
-  //     items: 2,
-  //     slidesToSlide: 2 // optional, default to 1.
-  //   },
-  //   mobile: {
-  //     breakpoint: { max: 464, min: 0 },
-  //     items: 1,
-  //     slidesToSlide: 1 // optional, default to 1.
-  //   }
-  // };
+
+  // Use funcToPass if available (likely from Sidebar's create team), otherwise use setProjectToggle directly
+  const handleCreateTeamClick = () => {
+    if (props.funcToPass) {
+      props.funcToPass(true);
+    } else {
+      // Fallback or alternative logic if funcToPass is not provided
+      // This might involve setting a local state or calling another prop
+      // For now, let's assume setProjectToggle can also open a generic "add project" modal
+      props.setProjectToggle(true);
+      props.setProjectPageId(""); // Clear project page ID for new project
+    }
+  };
+
+
   return (
     <div
-      className={`mt-2 ml-4 rounded-2xl flex flex-col h-full overflow-hidden
-        ${props.isDarkMode 
-          ? 'bg-gray-900 bg-opacity-90' 
-          : 'bg-amber-50 bg-opacity-55'}`}
-      style={{ width: "93vw" }}
+      className={`mt-1 ml-1 md:ml-2 rounded-xl flex flex-col h-full
+        ${props.isDarkMode ? 'bg-slate-900/70' : 'bg-sky-50/60'}
+        p-3 md:p-4 shadow-inner overflow-hidden`}
+      style={{ width: "calc(100% - 0.5rem)" }} // Adjusted width for slightly less margin
     >
-      <div
-        className="w-full flex-1 overflow-x-auto overflow-y-hidden"
-        style={{ scrollBehavior: "smooth", scrollbarColor: "transparent" }}
-      >
-        <div className="flex h-full">
-          {props.projects &&
-            props.projects.map((projectId: any, index: any) => (
-              <Project
-                projectId={projectId}
-                id={index}
-                key={projectId}
-                isDarkMode={props.isDarkMode}
-                {...props}
-              />
-            ))}
-          {!props.projects || !props.projects.length ? (
-            <div className={`w-full h-full flex items-center justify-center
-              ${props.isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-              <div className="text-center">
-                <span className={`text-3xl font-light font-mono
-                  ${props.isDarkMode ? 'text-amber-300' : 'text-amber-900'}`}>
-                  &lt;\&gt; No Teams
-                  <br />
-                  <br />
-                  <span className="text-4xl font-semibold">Form a Team!</span>
-                </span>
-                <hr className={`border-none w-4/5 border-2 mx-auto border-b-0 mt-4
-                  ${props.isDarkMode ? 'border-amber-300' : 'border-amber-900'}`} />
-              </div>
-            </div>
-          ) : null}
+      {(!props.projects || props.projects.length === 0) ? (
+        <div className={`w-full h-full flex items-center justify-center rounded-lg
+          ${props.isDarkMode ? 'bg-slate-800/50' : 'bg-slate-100/50'} p-6 md:p-8`}>
+          <div className="text-center">
+            <h2 className={`text-2xl md:text-3xl font-light mb-3
+              ${props.isDarkMode ? 'text-sky-300' : 'text-sky-700'}`}>
+              No Teams Yet!
+            </h2>
+            <p className={`text-md md:text-lg mb-5 ${props.isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              It&apos;s a bit quiet here. Let&apos;s get a project started.
+            </p>
+            <Button
+              onClick={handleCreateTeamClick}
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-base px-6 py-3"
+            >
+              Create New Team
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <Carousel
+          responsive={responsive}
+          containerClass="w-full h-full py-2" // Added padding for items
+          itemClass="px-1.5 md:px-2" // Padding around each item
+          swipeable={true}
+          draggable={true}
+          showDots={props.projects.length > 5} // Show dots if many items
+          arrows={props.projects.length > 3} // Show arrows if items exceed typical view
+          infinite={false}
+          keyBoardControl={true}
+          transitionDuration={300}
+          partialVisbile // Enable partial visibility for a more modern carousel feel
+        >
+          {props.projects.map((projectId: string) => (
+            <ProjectCard
+              projectId={projectId}
+              key={projectId}
+              isDarkMode={props.isDarkMode}
+              email={props.email}
+              setProjectToggle={props.setProjectToggle}
+              setProjectPageId={props.setProjectPageId}
+            />
+          ))}
+        </Carousel>
+      )}
     </div>
   );
 };

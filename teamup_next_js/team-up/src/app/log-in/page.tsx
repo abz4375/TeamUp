@@ -3,89 +3,106 @@
 import React from "react";
 import logo from "../assets/logo.png";
 import { signInBtnFunc } from "./components/signInWithGoogle";
-import { TextField } from "@mui/material";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Login = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [gLoading, setGLoading] = React.useState(false);
+  // const [gLoading, setGLoading] = React.useState(false); // This state is not used
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     // Add your email login logic here
+    console.log("Email login attempt with:", email, password);
   };
 
   return (
-    <div className="flex w-screen h-screen items-center justify-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 mx-4">
+    <div className="flex w-screen h-screen items-center justify-center p-4 bg-gradient-to-br from-slate-100 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-sky-950 dark:to-indigo-950">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-xl p-8 sm:p-10 mx-4">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-          <img src={logo.src} alt="logo" className="w-12 h-12 sm:w-10 sm:h-10" />
-          <span className="text-center text-2xl sm:text-3xl font-light">
-            Welcome to <span className="font-semibold">Team Up</span>!
-          </span>
+        <div className="flex flex-col items-center justify-center gap-4 mb-10">
+          <img src={logo.src} alt="logo" className="w-16 h-16 sm:w-20 sm:h-20" />
+          <h1 className="text-center text-3xl sm:text-4xl font-light text-slate-700 dark:text-slate-200">
+            Welcome to <span className="font-semibold text-blue-600 dark:text-blue-400">Team Up</span>!
+          </h1>
         </div>
 
         {/* Email Login Form */}
-        <form onSubmit={handleEmailLogin} className="space-y-4 mb-6">
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            variant="outlined"
-          />
-          <button
+        <form onSubmit={handleEmailLogin} className="space-y-6 mb-8">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Email address
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-12 text-base"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="h-12 text-base"
+            />
+          </div>
+          <Button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 
-                     font-semibold rounded-lg transition 
-                     flex items-center justify-center
-                     shadow-sm hover:shadow focus:outline-none focus:ring-2 
-                     focus:ring-blue-300 focus:ring-opacity-50"
+            className="w-full h-12 text-lg font-semibold"
+            size="lg"
           >
             Sign In
-          </button>
+          </Button>
         </form>
 
         {/* Divider */}
-        <div className="relative my-6">
+        <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+            <span className="px-4 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+              or continue with
+            </span>
           </div>
         </div>
 
         {/* Google Sign In Button */}
         <form action={signInBtnFunc} className="w-full">
-          <button
+          <Button
             type="submit"
-            className="w-full bg-blue-100 hover:bg-blue-200 px-6 py-3 
-                     text-gray-800 font-semibold rounded-lg transition 
-                     flex items-center justify-center gap-3 
-                     shadow-sm hover:shadow focus:outline-none focus:ring-2 
-                     focus:ring-blue-300 focus:ring-opacity-50"
+            variant="outline"
+            className="w-full h-12 text-base font-medium"
+            size="lg"
           >
             <img
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               src="https://img.icons8.com/color/48/google-logo.png"
               alt="google-logo"
-              className="w-6 h-6"
+              className="w-5 h-5 mr-3"
             />
-            <span className="whitespace-nowrap">Sign In with Google</span>
-          </button>
+            Sign In with Google
+          </Button>
         </form>
+        <p className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+          Don&apos;t have an account?{' '}
+          <a href="/sign-up" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+            Sign Up
+          </a>
+        </p>
       </div>
     </div>
   );
