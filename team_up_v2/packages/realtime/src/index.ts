@@ -33,6 +33,16 @@ io.on('connection', (socket) => {
         console.log(`User ${socket.id} left project room: project:${projectId}`);
     });
 
+    socket.on('join-user', (userId: string) => {
+        socket.join(`user:${userId}`);
+        console.log(`User ${socket.id} joined user room: user:${userId}`);
+    });
+
+    socket.on('leave-user', (userId: string) => {
+        socket.leave(`user:${userId}`);
+        console.log(`User ${socket.id} left user room: user:${userId}`);
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
     });

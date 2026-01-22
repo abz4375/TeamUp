@@ -107,7 +107,26 @@ export const taskRouter = createTRPCRouter({
                 }
             });
 
-            // Emit realtime event
+            // Create notifications for assignees
+            if (assigneeIds && assigneeIds.length > 0) {
+                await ctx.db.notification.createMany({
+                    data: assigneeIds.map(userId => ({
+                        userId,
+                        title: "New Task Assigned",
+                        message: `${ctx.session.user.name || 'Someone'} assigned you to: ${task.description.slice(0, 50)}...`,
+                        type: "TASK_ASSIGNED",
+                        link: `/projects/${task.projectId}`,
+                    }))
+                });
+
+                // Emit notification events
+                const { emitRealtimeEvent, RealtimeEvents } = await import("../lib/realtime");
+                for (const userId of assigneeIds) {
+                    await emitRealtimeEvent("notification", `user:${userId}`, { type: "unread_update" });
+                }
+            }
+
+            // Emit task update event
             const { emitRealtimeEvent, RealtimeEvents } = await import("../lib/realtime");
             await emitRealtimeEvent(RealtimeEvents.TASK_UPDATED, `project:${task.projectId}`, {
                 projectId: task.projectId,
@@ -123,7 +142,18 @@ export const taskRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { id, assigneeIds, ...data } = input;
 
+            // Get existing task to compare status/assignees
+            const existingTask = await ctx.db.task.findUnique({
+                where: { id },
+                include: { assignees: true }
+            });
+
+            if (!existingTask) throw new TRPCError({ code: 'NOT_FOUND' });
+
             if (assigneeIds) {
+                const currentAssigneeIds = existingTask.assignees.map(a => a.userId);
+                const newAssigneeIds = assigneeIds.filter(id => !currentAssigneeIds.includes(id));
+
                 await ctx.db.taskAssignee.deleteMany({
                     where: { taskId: id }
                 });
@@ -136,6 +166,24 @@ export const taskRouter = createTRPCRouter({
                         }))
                     });
                 }
+
+                // Notify new assignees
+                if (newAssigneeIds.length > 0) {
+                    await ctx.db.notification.createMany({
+                        data: newAssigneeIds.map(userId => ({
+                            userId,
+                            title: "New Task Assigned",
+                            message: `${ctx.session.user.name || 'Someone'} assigned you to a task.`,
+                            type: "TASK_ASSIGNED",
+                            link: `/projects/${existingTask.projectId}`,
+                        }))
+                    });
+
+                    const { emitRealtimeEvent } = await import("../lib/realtime");
+                    for (const userId of newAssigneeIds) {
+                        await emitRealtimeEvent("notification", `user:${userId}`, { type: "unread_update" });
+                    }
+                }
             }
 
             const task = await ctx.db.task.update({
@@ -147,7 +195,32 @@ export const taskRouter = createTRPCRouter({
                 }
             });
 
-            // Emit realtime event
+            // If status changed, notify all current assignees
+            if (data.status && data.status !== existingTask.status) {
+                const updatedTask = await ctx.db.task.findUnique({
+                    where: { id },
+                    include: { assignees: true }
+                });
+
+                if (updatedTask && updatedTask.assignees.length > 0) {
+                    await ctx.db.notification.createMany({
+                        data: updatedTask.assignees.map(a => ({
+                            userId: a.userId,
+                            title: "Task Status Updated",
+                            message: `Task status changed to ${data.status.replace('_', ' ')}`,
+                            type: "STATUS_CHANGE",
+                            link: `/projects/${task.projectId}`,
+                        }))
+                    });
+
+                    const { emitRealtimeEvent } = await import("../lib/realtime");
+                    for (const a of updatedTask.assignees) {
+                        await emitRealtimeEvent("notification", `user:${a.userId}`, { type: "unread_update" });
+                    }
+                }
+            }
+
+            // Emit task update event
             const { emitRealtimeEvent, RealtimeEvents } = await import("../lib/realtime");
             await emitRealtimeEvent(RealtimeEvents.TASK_UPDATED, `project:${task.projectId}`, {
                 projectId: task.projectId,

@@ -4,6 +4,8 @@ import { ZodError } from "zod";
 import { prisma } from "@team-up/db";
 import { minioClient } from "./lib/minio";
 
+import { auth } from "./auth";
+
 export const createTRPCContext = async (opts: { headers: Headers }) => {
     return {
         headers: opts.headers,
@@ -30,13 +32,18 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-    // In a real app, we verify the session here.
-    const mockUser = { id: "user_123", name: "Demo User", email: "demo@example.com" };
+    const session = await auth.api.getSession({
+        headers: ctx.headers,
+    });
+
+    if (!session) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
     return next({
         ctx: {
             ...ctx,
-            session: { user: mockUser },
+            session,
         },
     });
 });

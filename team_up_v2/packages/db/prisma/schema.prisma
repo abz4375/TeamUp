@@ -30,6 +30,7 @@ model User {
   createdTasks     Task[]           @relation("TaskCreator")
   assignedTasks    TaskAssignee[]
   taskApprovals    TaskApproval[]
+  notifications    Notification[]
   
   @@unique([email])
   @@map("user")
@@ -206,4 +207,22 @@ model TaskAttachment {
   
   @@index([taskId])
   @@index([uploadedAt])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  message   String
+  type      String   // e.g., "TASK_ASSIGNED", "STATUS_CHANGE"
+  link      String?  // URL to navigate to
+  
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
 }

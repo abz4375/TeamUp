@@ -35,12 +35,6 @@ export default function DashboardPage() {
         <div className="p-8 max-w-4xl mx-auto space-y-8">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <div className="flex items-center gap-4">
-                     <Button variant="outline" onClick={toggleSidebar}>
-                        {isSidebarOpen ? "Close Sidebar Store" : "Open Sidebar Store"}
-                     </Button>
-                    <ModeToggle />
-                </div>
             </div>
             
             <div className="grid gap-4 md:grid-cols-2">
@@ -77,23 +71,6 @@ export default function DashboardPage() {
                 <ProjectList />
             </div>
             
-            <div className="flex justify-end gap-2">
-                <Button
-                    variant="outline"
-                     onClick={() => router.push('/settings/profile')}
-                >
-                    Settings
-                </Button>
-                <Button 
-                    variant="destructive" 
-                    onClick={async () => {
-                        await authClient.signOut();
-                        router.push('/auth/signin');
-                    }}
-                >
-                    Sign Out
-                </Button>
-            </div>
         </div>
     );
 }

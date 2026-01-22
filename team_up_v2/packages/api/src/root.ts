@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./routers/user";
 import { projectRouter } from "./routers/project";
 import { taskRouter } from "./routers/task";
+import { notificationRouter } from "./routers/notification";
 
 export const appRouter = createTRPCRouter({
     hello: publicProcedure.query(() => {
@@ -10,6 +11,7 @@ export const appRouter = createTRPCRouter({
     user: userRouter,
     project: projectRouter,
     task: taskRouter,
+    notification: notificationRouter,
 });
 
 export type AppRouter = typeof appRouter;
