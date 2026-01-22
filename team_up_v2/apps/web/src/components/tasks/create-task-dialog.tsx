@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTaskSchema, type CreateTaskInput } from "@team-up/validation";
 import { trpc } from "@/lib/trpc/client";
 import { Plus } from "lucide-react";
+import { TaskAssigneeSelect } from "./task-assignee-select";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,12 +44,14 @@ export function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors },
     } = useForm<CreateTaskInput>({
         resolver: zodResolver(createTaskSchema),
         defaultValues: {
             projectId,
             description: "",
+            assigneeIds: [],
         }
     });
 
@@ -85,7 +88,20 @@ export function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
                         )}
                     </div>
                     
-                    {/* Future: Assignee Selection Component */}
+                    <div className="grid gap-2">
+                        <Label>Assignees</Label>
+                        <Controller
+                            control={control}
+                            name="assigneeIds"
+                            render={({ field }) => (
+                                <TaskAssigneeSelect
+                                    projectId={projectId}
+                                    selectedUserIds={field.value || []}
+                                    onChange={field.onChange}
+                                />
+                            )}
+                        />
+                    </div>
                     
                     <DialogFooter>
                         <Button type="submit" disabled={isPending}>

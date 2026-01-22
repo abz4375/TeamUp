@@ -10,11 +10,15 @@ import { ArrowLeft, Users, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { TaskList } from "@/components/tasks/task-list";
 import { CreateTaskDialog } from "@/components/tasks/create-task-dialog";
+import { useRealtime } from "@/hooks/use-realtime";
 
 export default function ProjectDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
+
+    // Enable realtime updates for this project
+    useRealtime(id);
 
     const { data: project, isLoading, error } = trpc.project.byId.useQuery({ id });
 
@@ -46,11 +50,6 @@ export default function ProjectDetailsPage() {
                     </Button>
                     <div className="flex items-center gap-4">
                         <h1 className="text-4xl font-bold tracking-tight">{project.title}</h1>
-                        {project.status && (
-                            <Badge variant={project.status === "ACTIVE" ? "default" : "secondary"}>
-                                {project.status}
-                            </Badge>
-                        )}
                     </div>
                 </div>
                 <div className="flex items-center gap-2">

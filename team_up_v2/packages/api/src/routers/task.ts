@@ -95,7 +95,7 @@ export const taskRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { assigneeIds, ...data } = input;
 
-            return ctx.db.task.create({
+            const task = await ctx.db.task.create({
                 data: {
                     ...data,
                     creatorId: ctx.session.user.id,
@@ -106,6 +106,16 @@ export const taskRouter = createTRPCRouter({
                         : undefined
                 }
             });
+
+            // Emit realtime event
+            const { emitRealtimeEvent, RealtimeEvents } = await import("../lib/realtime");
+            await emitRealtimeEvent(RealtimeEvents.TASK_UPDATED, `project:${task.projectId}`, {
+                projectId: task.projectId,
+                taskId: task.id,
+                type: 'create'
+            });
+
+            return task;
         }),
 
     update: protectedProcedure
@@ -113,11 +123,7 @@ export const taskRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             const { id, assigneeIds, ...data } = input;
 
-            // Optional: Check if user has permission to update tasks in this project
-            // (e.g. is member or owner of the project)
-
             if (assigneeIds) {
-                // Update assignees: simple way is to clear and re-add
                 await ctx.db.taskAssignee.deleteMany({
                     where: { taskId: id }
                 });
@@ -132,7 +138,7 @@ export const taskRouter = createTRPCRouter({
                 }
             }
 
-            return ctx.db.task.update({
+            const task = await ctx.db.task.update({
                 where: { id },
                 data: {
                     ...data,
@@ -140,6 +146,16 @@ export const taskRouter = createTRPCRouter({
                     submittedAt: data.submitted ? new Date() : undefined
                 }
             });
+
+            // Emit realtime event
+            const { emitRealtimeEvent, RealtimeEvents } = await import("../lib/realtime");
+            await emitRealtimeEvent(RealtimeEvents.TASK_UPDATED, `project:${task.projectId}`, {
+                projectId: task.projectId,
+                taskId: task.id,
+                type: 'update'
+            });
+
+            return task;
         }),
 
     delete: protectedProcedure

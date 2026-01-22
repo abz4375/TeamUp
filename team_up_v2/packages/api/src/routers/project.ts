@@ -155,4 +155,43 @@ export const projectRouter = createTRPCRouter({
                 where: { id: input.id }
             });
         }),
+
+    getMembers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const project = await ctx.db.project.findUnique({
+                where: { id: input.id },
+                include: {
+                    members: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (!project) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'Project not found'
+                });
+            }
+
+            // Check if user is a member
+            const isMember = project.members.some(m => m.userId === ctx.session.user.id);
+            if (!isMember) {
+                throw new TRPCError({
+                    code: 'FORBIDDEN',
+                    message: 'You do not have access to this project'
+                });
+            }
+
+            return project.members.map(m => m.user);
+        }),
 });
