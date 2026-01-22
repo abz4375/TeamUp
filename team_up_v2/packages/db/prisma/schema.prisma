@@ -1,0 +1,209 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Better Auth Models
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String
+  emailVerified Boolean @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  sessions      Session[]
+  accounts      Account[]
+  
+  // Team-Up specific relations
+  ownedProjects    Project[]        @relation("ProjectOwner")
+  projectMemberships ProjectMember[]
+  createdTasks     Task[]           @relation("TaskCreator")
+  assignedTasks    TaskAssignee[]
+  taskApprovals    TaskApproval[]
+  
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+// Team-Up Domain Models
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  
+  ownerId     String
+  owner       User     @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  members     ProjectMember[]
+  tasks       Task[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([ownerId])
+  @@index([title])
+  @@index([createdAt])
+}
+
+enum ProjectRole {
+  OWNER
+  MAINTAINER
+  CONTRIBUTOR
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  role      ProjectRole @default(CONTRIBUTOR)
+  
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  joinedAt  DateTime @default(now())
+  
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@index([role])
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+}
+
+model Task {
+  id          String      @id @default(cuid())
+  description String
+  status      TaskStatus  @default(NOT_STARTED)
+  submitted   Boolean     @default(false)
+  
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  creatorId   String
+  creator     User        @relation("TaskCreator", fields: [creatorId], references: [id])
+  
+  assignees   TaskAssignee[]
+  attachments TaskAttachment[]
+  approvals   TaskApproval[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  submittedAt DateTime?
+  
+  @@index([projectId])
+  @@index([creatorId])
+  @@index([status])
+  @@index([submitted])
+  @@index([createdAt])
+}
+
+model TaskAssignee {
+  id        String   @id @default(cuid())
+  
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  assignedAt DateTime @default(now())
+  
+  @@unique([taskId, userId])
+  @@index([taskId])
+  @@index([userId])
+}
+
+model TaskApproval {
+  id         String   @id @default(cuid())
+  
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  approverId String
+  approver   User     @relation(fields: [approverId], references: [id])
+  
+  approvedAt DateTime @default(now())
+  
+  @@unique([taskId, approverId])
+  @@index([taskId])
+  @@index([approverId])
+}
+
+model TaskAttachment {
+  id          String   @id @default(cuid())
+  filename    String
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+  
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  uploadedById String
+  uploadedAt   DateTime @default(now())
+  
+  @@index([taskId])
+  @@index([uploadedAt])
+}
