@@ -1,102 +1,47 @@
-# TeamUp - A Modern Collaborative Project Management Platform 🚀 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/abz4375/TeamUp)
+# TeamUp
 
-TeamUp is a full-stack web application built with Next.js 13+ that transforms project management and team collaboration. With real-time updates, task approval workflows, and comprehensive project management features, TeamUp helps teams work more efficiently together.
+A team collaboration platform built with Next.js, with task approval workflows and role-based project access.
 
-## Core Features 
+## Why
 
-### 1. Enhanced User Authentication
-- **Google OAuth Integration:** Secure authentication using Google credentials 🔐
-- **Profile Management:** User profiles with customizable avatars and email verification
-- **Role-Based Access:** Granular permission system for project access
+Most lightweight project trackers treat every member the same and let tasks be marked "done" unilaterally. TeamUp adds a review step: a contributor submits a task, and a project maintainer has to approve it before it counts as complete, with role-based permissions (owner / maintainer / contributor) controlling who can do what.
 
-### 2. Comprehensive Project Management
-- **Project Creation:** Initialize projects with Markdown-rich descriptions 📝
-- **Team Management:** 
-  - Invite team members through email search
-  - Assign roles (owner 👑, maintainer 🔧, contributor 👷)
-  - Remove members with automatic task reassignment
-- **Project Deletion:** Safely remove projects with cleanup of associated tasks and user references
+## Features
 
-### 3. Advanced Task Management
-- **Task Creation:** 
-  - Create detailed tasks with rich descriptions
-  - Upload and attach files to tasks 📎
-  - Assign multiple team members to tasks
-- **Task Workflow:**
-  - Submit completed tasks for review
-  - Multi-stage approval process by project maintainers ✅
-  - Progress tracking with visual indicators
-- **Task Status:** Real-time progress bars showing approval status
+- Google OAuth authentication with role-based access control per project
+- Project creation with Markdown-rich descriptions
+- Team management — invite by email, assign roles, remove members with automatic task reassignment
+- Task creation with file attachments and multi-member assignment
+- Multi-stage task approval workflow with progress tracking
+- Dark/light theme, responsive layout
 
-### 4. User Experience
-- **Dark/Light Mode:** Toggle between dark and light themes for comfortable viewing 🌓
-- **Responsive Design:** Fully responsive interface across devices
-- **Real-time Updates:** Instant reflection of project and task changes
-- **Markdown Support:** Rich text formatting for project and task descriptions
+## Tech Stack
 
-### 5. File Management
-- **File Attachments:** Upload and manage files associated with tasks
-- **Secure Storage:** Safe file storage and access control
+Next.js 13+, React, Material-UI, MongoDB, Mongoose, NextAuth.js
 
-## Technical Stack
+## Local Setup
 
-- **Frontend:** Next.js 13+, React, Material-UI
-- **Backend:** Next.js API Routes
-- **Database:** MongoDB with Mongoose
-- **Authentication:** NextAuth.js with Google Provider
-- **Storage:** File upload capabilities with form handling
+The app lives in `teamup_next_js/team-up`.
 
-## Getting Started
-
-1. Clone the repository:
 ```bash
 git clone https://github.com/abz4375/TeamUp.git
-```
-
-2. Install dependencies:
-```bash
-cd TeamUp
+cd TeamUp/teamup_next_js/team-up
 npm install
 ```
 
-3. Configure environment variables:
+Set environment variables:
+
 ```env
 MONGODB_URI=your_mongodb_uri
 AUTH_GOOGLE_ID=your_google_client_id
 AUTH_GOOGLE_SECRET=your_google_client_secret
 ```
 
-4. Run the development server:
 ```bash
 npm run dev
 ```
 
-## Project Structure
+## Future Improvements
 
-```
-team-up/
-├── src/
-│   ├── app/            # Next.js 13+ app directory
-│   ├── components/     # Reusable React components
-│   └── models/         # MongoDB schemas
-├── public/            # Static assets
-└── config/           # Configuration files
-```
-
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
----
-
-Built with 💻 by the TeamUp team
+- Real-time updates via WebSockets instead of polling/refetch
+- Notification system for task approvals and assignments
